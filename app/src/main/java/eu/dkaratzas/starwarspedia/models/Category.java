@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SWModelList<T> implements Parcelable {
+public class Category<T> implements Parcelable {
     @JsonProperty("next")
     private String next;
     @JsonProperty("previous")
@@ -19,7 +19,7 @@ public class SWModelList<T> implements Parcelable {
     @JsonProperty("results")
     public List<T> results;
 
-    public SWModelList() {
+    public Category() {
         this.next = "";
         this.previous = "";
         this.count = 0;
@@ -43,21 +43,21 @@ public class SWModelList<T> implements Parcelable {
         dest.writeInt(this.count);
     }
 
-    protected SWModelList(Parcel in) {
+    protected Category(Parcel in) {
         this.next = in.readString();
         this.previous = in.readString();
         this.count = in.readInt();
     }
 
-    public static final Creator<SWModelList> CREATOR = new Creator<SWModelList>() {
+    public static final Creator<Category> CREATOR = new Creator<Category>() {
         @Override
-        public SWModelList createFromParcel(Parcel source) {
-            return new SWModelList(source);
+        public Category createFromParcel(Parcel source) {
+            return new Category(source);
         }
 
         @Override
-        public SWModelList[] newArray(int size) {
-            return new SWModelList[size];
+        public Category[] newArray(int size) {
+            return new Category[size];
         }
     };
     //endregion

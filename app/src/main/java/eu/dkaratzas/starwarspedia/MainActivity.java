@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-
 import com.orhanobut.logger.Logger;
 
 import butterknife.BindView;
@@ -17,9 +16,11 @@ import butterknife.ButterKnife;
 import eu.dkaratzas.starsgl.widget.StarView;
 import eu.dkaratzas.starwarspedia.api.ApiCallback;
 import eu.dkaratzas.starwarspedia.api.StarWarsApi;
+import eu.dkaratzas.starwarspedia.api.StarWarsService;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
-import eu.dkaratzas.starwarspedia.models.People;
+import eu.dkaratzas.starwarspedia.models.Category;
+import eu.dkaratzas.starwarspedia.models.Film;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -54,9 +55,9 @@ public class MainActivity extends AppCompatActivity
 
         mNavView.setNavigationItemSelectedListener(this);
 
-        StarWarsApi.getApi().getCallPage(1, new People(), new ApiCallback<People>() {
+        StarWarsApi.getApi().getResourcesOfCategory(1, StarWarsService.SwapiCategory.FILMS, new ApiCallback<Category<Film>>() {
             @Override
-            public void onResponse(People result) {
+            public void onResponse(Category<Film> result) {
                 Logger.d(result);
             }
 

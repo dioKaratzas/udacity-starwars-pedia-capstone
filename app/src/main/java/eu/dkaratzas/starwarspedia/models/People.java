@@ -184,5 +184,28 @@ public class People implements Parcelable {
     public String getHeight() {
         return height;
     }
+
+    @Override
+    public String toString() {
+        return "People{" +
+                "films=" + films +
+                ", homeworld='" + homeworld + '\'' +
+                ", gender='" + gender + '\'' +
+                ", skinColor='" + skinColor + '\'' +
+                ", edited='" + edited + '\'' +
+                ", created='" + created + '\'' +
+                ", mass='" + mass + '\'' +
+                ", vehicles=" + vehicles +
+                ", url='" + url + '\'' +
+                ", hairColor='" + hairColor + '\'' +
+                ", birthYear='" + birthYear + '\'' +
+                ", eyeColor='" + eyeColor + '\'' +
+                ", species=" + species +
+                ", starships=" + starships +
+                ", name='" + name + '\'' +
+                ", height='" + height + '\'' +
+                '}';
+    }
+
     //endregion
 }
