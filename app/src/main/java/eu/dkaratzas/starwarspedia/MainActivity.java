@@ -30,8 +30,7 @@ public class MainActivity extends AppCompatActivity
                 customDrawerButton.changeState();
             }
         });
-
-        Misc.setStatusBarTranslucent(this, findViewById(R.id.ivLogo));
+        Misc.setTransparentForDrawerLayout(this, drawer, findViewById(R.id.ivLogo));
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);

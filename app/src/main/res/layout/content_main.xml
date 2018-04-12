@@ -7,12 +7,22 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity">
 
-    <!--tools:showIn="@layout/activity_main"-->
-
-    <eu.dkaratzas.starsgl.widget.StarView
-        android:id="@+id/starView"
+    <!--DrawerLayout not drawn with GLSurfaceView as content-->
+    <!--https://stackoverflow.com/questions/23691012/drawerlayout-listview-not-drawn-with-glsurfaceview-as-content-->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <eu.dkaratzas.starsgl.widget.StarView
+            android:id="@+id/starView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
 
     <ImageView
         android:id="@+id/ivLogo"
@@ -24,7 +34,7 @@
         app:layout_constraintDimensionRatio=""
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/starView"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_star_wars_logo" />
 
     <TextView

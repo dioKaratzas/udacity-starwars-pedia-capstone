@@ -6,41 +6,44 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 public class Misc {
 
-    //TODO: Dont work on Oreo
-    public static void setStatusBarTranslucent(Activity activity, @Nullable View viewBeloweStatusBar) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (viewBeloweStatusBar != null) {
-                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) viewBeloweStatusBar.getLayoutParams();
-
-                params.topMargin = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ? (params.topMargin + getStatusBarHeight(activity.getApplicationContext())) : 0;
-                viewBeloweStatusBar.setLayoutParams(params);
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
-            } else {
-                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            }
+    public static void setTransparentForDrawerLayout(Activity activity, DrawerLayout drawerLayout, @Nullable View viewToAddTopMargin) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return;
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
+        } else {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+
+        ViewGroup contentLayout = (ViewGroup) drawerLayout.getChildAt(0);
+
+        if (viewToAddTopMargin != null && viewToAddTopMargin.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) viewToAddTopMargin.getLayoutParams();
+
+            params.topMargin += getStatusBarHeight(activity.getApplicationContext());
+            viewToAddTopMargin.setLayoutParams(params);
+        }
+
+        setDrawerLayoutProperty(drawerLayout, contentLayout);
     }
 
-    public static void setWindowFlag(Activity activity, final int bits, boolean on) {
-        Window win = activity.getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
+    private static void setDrawerLayoutProperty(DrawerLayout drawerLayout, ViewGroup drawerLayoutContentLayout) {
+        ViewGroup drawer = (ViewGroup) drawerLayout.getChildAt(1);
+        drawerLayout.setFitsSystemWindows(false);
+        drawerLayoutContentLayout.setFitsSystemWindows(false);
+        drawerLayoutContentLayout.setClipToPadding(true);
+        drawer.setFitsSystemWindows(false);
     }
 
     // A method to find height of the status bar
