@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "279196813530",
+    "firebase_url": "https://starwarspedia-5ab05.firebaseio.com",
+    "project_id": "starwarspedia-5ab05",
+    "storage_bucket": "starwarspedia-5ab05.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279196813530:android:3590e9abf743c245",
+        "android_client_info": {
+          "package_name": "eu.dkaratzas.starwarspedia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "279196813530-vn9eks27lsr8u28qnhmakq6r8v7tq877.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "eu.dkaratzas.starwarspedia",
+            "certificate_hash": "684dcef031172dfe214ab322c55b29d44ea24ad3"
+          }
+        },
+        {
+          "client_id": "279196813530-tnvpm53rpmrrcmdo15iqfiafbbqa4q7n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCCpFN8K3tfYDDIrLkOdyJPFqBWIq-DeM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "279196813530-tnvpm53rpmrrcmdo15iqfiafbbqa4q7n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

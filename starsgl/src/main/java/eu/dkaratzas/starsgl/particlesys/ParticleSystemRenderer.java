@@ -30,6 +30,7 @@ public class ParticleSystemRenderer implements GLSurfaceView.Renderer {
     public int sizeX = 35;
     public int sizeY = 70;
     public float mTime;
+    public float mSpeed = 3500f;
     private GLSurfaceView mGlSurfaceView;
     /**
      * Store the model matrix. This matrix is used to move models from object space (where each model can be thought
@@ -187,7 +188,7 @@ public class ParticleSystemRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mMVPMatrix, 0);
 
         // Pass in u_Time
-        GLES20.glUniform1f(timeHandle, (System.currentTimeMillis() - mStartTime) / 3500f);
+        GLES20.glUniform1f(timeHandle, (System.currentTimeMillis() - mStartTime) / mSpeed);
 
         // u_Resolution
         GLES20.glUniform2f(resolutionHandle, mWidth, mHeight);

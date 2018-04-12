@@ -18,6 +18,7 @@ public class StarView extends GLSurfaceView {
     private ActivityManager activityManager;
     private ConfigurationInfo configurationInfo;
     private boolean supportsEs2;
+    private ParticleSystemRenderer mRenderer;
 
     public StarView(Context context) {
         super(context);
@@ -32,7 +33,7 @@ public class StarView extends GLSurfaceView {
                 // Request an OpenGL ES 2.0 compatible context.
 
                 // Set the renderer to our demo renderer, defined below.
-                ParticleSystemRenderer mRenderer = new ParticleSystemRenderer(this, context);
+                mRenderer = new ParticleSystemRenderer(this, context);
 
                 setEGLContextClientVersion(2);
                 setEGLConfigChooser(8, 8, 8, 8, 0, 0);
@@ -59,7 +60,7 @@ public class StarView extends GLSurfaceView {
                 // Request an OpenGL ES 2.0 compatible context.
 
                 // Set the renderer to our demo renderer, defined below.
-                ParticleSystemRenderer mRenderer = new ParticleSystemRenderer(this, context);
+                mRenderer = new ParticleSystemRenderer(this, context);
 
                 setEGLContextClientVersion(2);
                 setEGLConfigChooser(8, 8, 8, 8, 0, 0);
@@ -88,5 +89,15 @@ public class StarView extends GLSurfaceView {
             //Pause the starView
             onPause();
         }
+    }
+
+    public void setSpeedFastTraveling() {
+        if (mRenderer != null)
+            mRenderer.mSpeed = 150f;
+    }
+
+    public void setSpeedNormal() {
+        if (mRenderer != null)
+            mRenderer.mSpeed = 3500f;
     }
 }

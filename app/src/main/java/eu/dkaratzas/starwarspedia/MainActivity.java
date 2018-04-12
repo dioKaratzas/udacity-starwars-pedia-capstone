@@ -7,33 +7,64 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
+
+import com.orhanobut.logger.Logger;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import eu.dkaratzas.starsgl.widget.StarView;
+import eu.dkaratzas.starwarspedia.api.ApiCallback;
+import eu.dkaratzas.starwarspedia.api.StarWarsApi;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
+import eu.dkaratzas.starwarspedia.models.People;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    @BindView(R.id.starView)
+    StarView mStarView;
+    @BindView(R.id.ivLogo)
+    ImageView mIvLogo;
+    @BindView(R.id.nav_view)
+    NavigationView mNavView;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+    @BindView(R.id.ivDrawerMenu)
+    CustomDrawerButton mDrawerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        Misc.setTransparentForDrawerLayout(this, mDrawerLayout, mIvLogo);
 
-        final CustomDrawerButton customDrawerButton = (CustomDrawerButton) findViewById(R.id.ivDrawerMenu);
-        customDrawerButton.setDrawerLayout(drawer);
-        customDrawerButton.getDrawerLayout().addDrawerListener(customDrawerButton);
-        customDrawerButton.setOnClickListener(new View.OnClickListener() {
+        mDrawerButton.setDrawerLayout(mDrawerLayout);
+        mDrawerButton.getDrawerLayout().addDrawerListener(mDrawerButton);
+        mDrawerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                customDrawerButton.changeState();
+                mDrawerButton.changeState();
             }
         });
-        Misc.setTransparentForDrawerLayout(this, drawer, findViewById(R.id.ivLogo));
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavView.setNavigationItemSelectedListener(this);
+
+        StarWarsApi.getApi().getCallPage(1, new People(), new ApiCallback<People>() {
+            @Override
+            public void onResponse(People result) {
+                Logger.d(result);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
     }
 
     @Override
@@ -55,7 +86,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+            ((StarView) findViewById(R.id.starView)).setSpeedFastTraveling();
         } else if (id == R.id.nav_gallery) {
+            ((StarView) findViewById(R.id.starView)).setSpeedNormal();
 
         } else if (id == R.id.nav_slideshow) {
 
