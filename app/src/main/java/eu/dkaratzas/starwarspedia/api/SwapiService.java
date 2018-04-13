@@ -13,7 +13,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public interface StarWarsService {
+public interface SwapiService {
     @GET("")
     Call<Root> getRootUrls();
 
@@ -52,14 +52,5 @@ public interface StarWarsService {
 
     @GET("planets/{id}/")
     Call<Planet> getPlanet(@Path("id") int planetId);
-
-    public enum SwapiCategory {
-        FILMS,
-        PLANETS,
-        SPECIES,
-        STARSHIPS,
-        VEHICLES,
-        PEOPLE
-    }
 
 }

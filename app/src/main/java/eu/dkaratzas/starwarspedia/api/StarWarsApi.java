@@ -5,20 +5,20 @@ import android.support.annotation.NonNull;
 import com.orhanobut.logger.Logger;
 
 import java.io.Serializable;
+import java.security.InvalidParameterException;
 
 import eu.dkaratzas.starwarspedia.Constants;
+import eu.dkaratzas.starwarspedia.models.Category;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import static eu.dkaratzas.starwarspedia.api.StarWarsService.SwapiCategory;
-
 public class StarWarsApi implements Serializable {
 
     private static volatile StarWarsApi sharedInstance = new StarWarsApi();
-    private StarWarsService swapiService;
+    private SwapiService swapiService;
 
     private StarWarsApi() {
         //Prevent from the reflection api.
@@ -31,7 +31,7 @@ public class StarWarsApi implements Serializable {
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
 
-        swapiService = retrofit.create(StarWarsService.class);
+        swapiService = retrofit.create(SwapiService.class);
     }
 
     public static StarWarsApi getApi() {
@@ -44,8 +44,7 @@ public class StarWarsApi implements Serializable {
         return sharedInstance;
     }
 
-
-    public <T> void getResourceById(int id, SwapiCategory swapiCategory, final ApiCallback<T> apiCallback) {
+    private <T> Call getResourceById(int id, SwapiCategory swapiCategory, final ApiCallback<T> apiCallback) {
         Call<T> call = null;
 
         switch (swapiCategory) {
@@ -78,7 +77,7 @@ public class StarWarsApi implements Serializable {
             @Override
             public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
                 if (call.isCanceled()) {
-                    Logger.e("Request was cancelled");
+                    Logger.d("Request was cancelled");
                     apiCallback.onCancel();
                 } else {
                     Logger.e(t.getMessage());
@@ -86,9 +85,15 @@ public class StarWarsApi implements Serializable {
                 }
             }
         });
+
+        return call;
     }
 
-    public <T> void getResourcesOfCategory(int page, SwapiCategory swapiCategory, final ApiCallback<T> apiCallback) {
+    private <T> Call getResourcesOfCategory(int page, SwapiCategory swapiCategory, final ApiCallback<T> apiCallback) {
+        if (page < 1) {
+            throw new InvalidParameterException("Page must be a number starting from 1");
+        }
+
         Call<T> call = null;
 
         switch (swapiCategory) {
@@ -121,7 +126,7 @@ public class StarWarsApi implements Serializable {
             @Override
             public void onFailure(Call<T> call, Throwable t) {
                 if (call.isCanceled()) {
-                    Logger.e("Request was cancelled");
+                    Logger.d("Request was cancelled");
                     apiCallback.onCancel();
                 } else {
                     Logger.e(t.getMessage());
@@ -129,6 +134,56 @@ public class StarWarsApi implements Serializable {
                 }
             }
         });
+
+        return call;
+    }
+
+    public <T> Call getPeopleById(int id, ApiCallback<T> apiCallback) {
+        return getResourceById(id, SwapiCategory.PEOPLE, apiCallback);
+    }
+
+    public <T> Call getAllPeopleAtPage(int page, ApiCallback<Category<T>> apiCallback) {
+        return getResourcesOfCategory(page, SwapiCategory.PEOPLE, apiCallback);
+    }
+
+    public <T> Call getFilmById(int id, ApiCallback<T> apiCallback) {
+        return getResourceById(id, SwapiCategory.FILMS, apiCallback);
+    }
+
+    public <T> Call getAllFilmsAtPage(int page, ApiCallback<Category<T>> apiCallback) {
+        return getResourcesOfCategory(page, SwapiCategory.FILMS, apiCallback);
+    }
+
+    public <T> Call getStarshipById(int id, ApiCallback<T> apiCallback) {
+        return getResourceById(id, SwapiCategory.STARSHIPS, apiCallback);
+    }
+
+    public <T> Call getAllStarshipsAtPage(int page, ApiCallback<Category<T>> apiCallback) {
+        return getResourcesOfCategory(page, SwapiCategory.STARSHIPS, apiCallback);
+    }
+
+    public <T> Call getVehicleById(int id, ApiCallback<T> apiCallback) {
+        return getResourceById(id, SwapiCategory.VEHICLES, apiCallback);
+    }
+
+    public <T> Call getAllVehiclesAtPage(int page, ApiCallback<Category<T>> apiCallback) {
+        return getResourcesOfCategory(page, SwapiCategory.VEHICLES, apiCallback);
+    }
+
+    public <T> Call getSpeciesById(int id, ApiCallback<T> apiCallback) {
+        return getResourceById(id, SwapiCategory.SPECIES, apiCallback);
+    }
+
+    public <T> Call getAllSpeciesAtPage(int page, ApiCallback<Category<T>> apiCallback) {
+        return getResourcesOfCategory(page, SwapiCategory.SPECIES, apiCallback);
+    }
+
+    public <T> Call getPlanetById(int id, ApiCallback<T> apiCallback) {
+        return getResourceById(id, SwapiCategory.PLANETS, apiCallback);
+    }
+
+    public <T> Call getAllPlanetsAtPage(int page, ApiCallback<Category<T>> apiCallback) {
+        return getResourcesOfCategory(page, SwapiCategory.PLANETS, apiCallback);
     }
 }
 

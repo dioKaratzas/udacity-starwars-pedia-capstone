@@ -16,11 +16,10 @@ import butterknife.ButterKnife;
 import eu.dkaratzas.starsgl.widget.StarView;
 import eu.dkaratzas.starwarspedia.api.ApiCallback;
 import eu.dkaratzas.starwarspedia.api.StarWarsApi;
-import eu.dkaratzas.starwarspedia.api.StarWarsService;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.models.Category;
-import eu.dkaratzas.starwarspedia.models.Film;
+import eu.dkaratzas.starwarspedia.models.People;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,10 +54,10 @@ public class MainActivity extends AppCompatActivity
 
         mNavView.setNavigationItemSelectedListener(this);
 
-        StarWarsApi.getApi().getResourcesOfCategory(1, StarWarsService.SwapiCategory.FILMS, new ApiCallback<Category<Film>>() {
+        StarWarsApi.getApi().getAllPeopleAtPage(1, new ApiCallback<Category<People>>() {
             @Override
-            public void onResponse(Category<Film> result) {
-                Logger.d(result);
+            public void onResponse(Category<People> result) {
+                Logger.d(result.results.get(0).toString());
             }
 
             @Override
