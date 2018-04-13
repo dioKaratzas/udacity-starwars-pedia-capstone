@@ -1,6 +1,6 @@
 package eu.dkaratzas.starwarspedia.api;
 
-public interface ApiCallback<T> {
+public interface StarWarsApiCallback<T> {
     void onResponse(T result);
 
     void onCancel();

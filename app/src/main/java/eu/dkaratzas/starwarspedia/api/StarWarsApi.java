@@ -1,14 +1,19 @@
 package eu.dkaratzas.starwarspedia.api;
 
-import android.support.annotation.NonNull;
-
 import com.orhanobut.logger.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
 
 import eu.dkaratzas.starwarspedia.Constants;
 import eu.dkaratzas.starwarspedia.models.Category;
+import eu.dkaratzas.starwarspedia.models.Film;
+import eu.dkaratzas.starwarspedia.models.People;
+import eu.dkaratzas.starwarspedia.models.Planet;
+import eu.dkaratzas.starwarspedia.models.Species;
+import eu.dkaratzas.starwarspedia.models.Starship;
+import eu.dkaratzas.starwarspedia.models.Vehicle;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,146 +49,133 @@ public class StarWarsApi implements Serializable {
         return sharedInstance;
     }
 
-    private <T> Call getResourceById(int id, SwapiCategory swapiCategory, final ApiCallback<T> apiCallback) {
-        Call<T> call = null;
+    private RequestType getResourceById(int id, SwapiCategory swapiCategory) {
 
         switch (swapiCategory) {
             case FILMS:
-                call = (Call<T>) swapiService.getFilm(id);
-                break;
+                return new RequestType(swapiService.getFilm(id));
             case PEOPLE:
-                call = (Call<T>) swapiService.getPeople(id);
-                break;
+                return new RequestType(swapiService.getPeople(id));
             case PLANETS:
-                call = (Call<T>) swapiService.getPlanet(id);
-                break;
+                return new RequestType(swapiService.getPlanet(id));
             case SPECIES:
-                call = (Call<T>) swapiService.getSpecies(id);
-                break;
+                return new RequestType(swapiService.getSpecies(id));
             case VEHICLES:
-                call = (Call<T>) swapiService.getVehicle(id);
-                break;
+                return new RequestType(swapiService.getVehicle(id));
             case STARSHIPS:
-                call = (Call<T>) swapiService.getStarship(id);
-                break;
+                return new RequestType(swapiService.getStarship(id));
         }
 
-        call.enqueue(new Callback<T>() {
-            @Override
-            public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
-                apiCallback.onResponse(response.body());
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
-                if (call.isCanceled()) {
-                    Logger.d("Request was cancelled");
-                    apiCallback.onCancel();
-                } else {
-                    Logger.e(t.getMessage());
-                    apiCallback.onResponse(null);
-                }
-            }
-        });
-
-        return call;
+        return null;
     }
 
-    private <T> Call getResourcesOfCategory(int page, SwapiCategory swapiCategory, final ApiCallback<T> apiCallback) {
+    private RequestType getResourcesOfCategoryOnPage(int page, SwapiCategory swapiCategory) {
         if (page < 1) {
             throw new InvalidParameterException("Page must be a number starting from 1");
         }
 
-        Call<T> call = null;
-
         switch (swapiCategory) {
             case FILMS:
-                call = (Call<T>) swapiService.getAllFilms(page);
-                break;
+                return new RequestType(swapiService.getAllFilms(page));
             case PEOPLE:
-                call = (Call<T>) swapiService.getAllPeople(page);
-                break;
+                return new RequestType(swapiService.getAllPeople(page));
             case PLANETS:
-                call = (Call<T>) swapiService.getAllPlanets(page);
-                break;
+                return new RequestType(swapiService.getAllPlanets(page));
             case SPECIES:
-                call = (Call<T>) swapiService.getAllSpecies(page);
-                break;
+                return new RequestType(swapiService.getAllSpecies(page));
             case VEHICLES:
-                call = (Call<T>) swapiService.getAllVehicles(page);
-                break;
+                return new RequestType(swapiService.getAllVehicles(page));
             case STARSHIPS:
-                call = (Call<T>) swapiService.getAllStarships(page);
-                break;
+                return new RequestType(swapiService.getAllStarships(page));
+        }
+        return null;
+    }
+
+    public RequestType<People> getPeopleById(int id) {
+        return getResourceById(id, SwapiCategory.PEOPLE);
+    }
+
+    public RequestType<Category<People>> getAllPeopleAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.PEOPLE);
+    }
+
+    public RequestType<Film> getFilmById(int id) {
+        return getResourceById(id, SwapiCategory.FILMS);
+    }
+
+    public RequestType<Category<Film>> getAllFilmsAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.FILMS);
+    }
+
+    public RequestType<Starship> getStarshipById(int id) {
+        return getResourceById(id, SwapiCategory.STARSHIPS);
+    }
+
+    public RequestType<Category<Starship>> getAllStarshipsAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.STARSHIPS);
+    }
+
+    public RequestType<Vehicle> getVehicleById(int id) {
+        return getResourceById(id, SwapiCategory.VEHICLES);
+    }
+
+    public RequestType<Category<Vehicle>> getAllVehiclesAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.VEHICLES);
+    }
+
+    public RequestType<Species> getSpeciesById(int id) {
+        return getResourceById(id, SwapiCategory.SPECIES);
+    }
+
+    public RequestType<Category<Species>> getAllSpeciesAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.SPECIES);
+    }
+
+    public RequestType<Planet> getPlanetById(int id) {
+        return getResourceById(id, SwapiCategory.PLANETS);
+    }
+
+    public RequestType<Category<Planet>> getAllPlanetsAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.PLANETS);
+    }
+
+    public class RequestType<T> {
+        private Call<T> delegate;
+
+        public RequestType(Call<T> delegate) {
+            this.delegate = delegate;
         }
 
-        call.enqueue(new Callback<T>() {
-            @Override
-            public void onResponse(Call<T> call, Response<T> response) {
-                apiCallback.onResponse(response.body());
+        public T sync() {
+            try {
+                return delegate.execute().body();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
             }
+        }
 
-            @Override
-            public void onFailure(Call<T> call, Throwable t) {
-                if (call.isCanceled()) {
-                    Logger.d("Request was cancelled");
-                    apiCallback.onCancel();
-                } else {
-                    Logger.e(t.getMessage());
-                    apiCallback.onResponse(null);
+        public Call<T> async(final StarWarsApiCallback<T> apiCallback) {
+            delegate.enqueue(new Callback<T>() {
+                @Override
+                public void onResponse(Call<T> call, Response<T> response) {
+                    apiCallback.onResponse(response.body());
                 }
-            }
-        });
 
-        return call;
-    }
+                @Override
+                public void onFailure(Call<T> call, Throwable t) {
+                    if (call.isCanceled()) {
+                        Logger.d("Request was cancelled");
+                        apiCallback.onCancel();
+                    } else {
+                        Logger.e(t.getMessage());
+                        apiCallback.onResponse(null);
+                    }
+                }
+            });
 
-    public <T> Call getPeopleById(int id, ApiCallback<T> apiCallback) {
-        return getResourceById(id, SwapiCategory.PEOPLE, apiCallback);
-    }
-
-    public <T> Call getAllPeopleAtPage(int page, ApiCallback<Category<T>> apiCallback) {
-        return getResourcesOfCategory(page, SwapiCategory.PEOPLE, apiCallback);
-    }
-
-    public <T> Call getFilmById(int id, ApiCallback<T> apiCallback) {
-        return getResourceById(id, SwapiCategory.FILMS, apiCallback);
-    }
-
-    public <T> Call getAllFilmsAtPage(int page, ApiCallback<Category<T>> apiCallback) {
-        return getResourcesOfCategory(page, SwapiCategory.FILMS, apiCallback);
-    }
-
-    public <T> Call getStarshipById(int id, ApiCallback<T> apiCallback) {
-        return getResourceById(id, SwapiCategory.STARSHIPS, apiCallback);
-    }
-
-    public <T> Call getAllStarshipsAtPage(int page, ApiCallback<Category<T>> apiCallback) {
-        return getResourcesOfCategory(page, SwapiCategory.STARSHIPS, apiCallback);
-    }
-
-    public <T> Call getVehicleById(int id, ApiCallback<T> apiCallback) {
-        return getResourceById(id, SwapiCategory.VEHICLES, apiCallback);
-    }
-
-    public <T> Call getAllVehiclesAtPage(int page, ApiCallback<Category<T>> apiCallback) {
-        return getResourcesOfCategory(page, SwapiCategory.VEHICLES, apiCallback);
-    }
-
-    public <T> Call getSpeciesById(int id, ApiCallback<T> apiCallback) {
-        return getResourceById(id, SwapiCategory.SPECIES, apiCallback);
-    }
-
-    public <T> Call getAllSpeciesAtPage(int page, ApiCallback<Category<T>> apiCallback) {
-        return getResourcesOfCategory(page, SwapiCategory.SPECIES, apiCallback);
-    }
-
-    public <T> Call getPlanetById(int id, ApiCallback<T> apiCallback) {
-        return getResourceById(id, SwapiCategory.PLANETS, apiCallback);
-    }
-
-    public <T> Call getAllPlanetsAtPage(int page, ApiCallback<Category<T>> apiCallback) {
-        return getResourcesOfCategory(page, SwapiCategory.PLANETS, apiCallback);
+            return delegate;
+        }
     }
 }
 
