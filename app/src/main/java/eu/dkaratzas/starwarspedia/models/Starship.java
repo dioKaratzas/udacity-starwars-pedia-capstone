@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Starship implements Parcelable {
+import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+
+public class Starship extends SwapiModel implements Parcelable {
     @JsonProperty("max_atmosphering_speed")
     private String maxAtmospheringSpeed;
     @JsonProperty("cargo_capacity")
@@ -201,6 +203,21 @@ public class Starship implements Parcelable {
 
     public String getModel() {
         return model;
+    }
+
+    @Override
+    public int getId() {
+        return getIdFromUrl(url);
+    }
+
+    @Override
+    public String getTitle() {
+        return name;
+    }
+
+    @Override
+    public SwapiCategory getCategory() {
+        return SwapiCategory.STARSHIP;
     }
     //endregion
 }

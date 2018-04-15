@@ -1,5 +1,8 @@
 package eu.dkaratzas.starwarspedia.api;
 
+import android.content.Context;
+import android.support.v4.app.LoaderManager;
+
 import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
@@ -7,12 +10,13 @@ import java.io.Serializable;
 import java.security.InvalidParameterException;
 
 import eu.dkaratzas.starwarspedia.Constants;
-import eu.dkaratzas.starwarspedia.models.Category;
+import eu.dkaratzas.starwarspedia.libs.RetrofitLoader.CustomLoader;
 import eu.dkaratzas.starwarspedia.models.Film;
 import eu.dkaratzas.starwarspedia.models.People;
 import eu.dkaratzas.starwarspedia.models.Planet;
 import eu.dkaratzas.starwarspedia.models.Species;
 import eu.dkaratzas.starwarspedia.models.Starship;
+import eu.dkaratzas.starwarspedia.models.SwapiModelList;
 import eu.dkaratzas.starwarspedia.models.Vehicle;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,6 +24,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+/**
+ * StarWarsApi Singleton Class
+ * Every call returns {@link Request} that gives the ability
+ * to run the retrofit calls synchronous or asynchronous.
+ */
 public class StarWarsApi implements Serializable {
 
     private static volatile StarWarsApi sharedInstance = new StarWarsApi();
@@ -49,112 +58,126 @@ public class StarWarsApi implements Serializable {
         return sharedInstance;
     }
 
-    private RequestType getResourceById(int id, SwapiCategory swapiCategory) {
+    public Request<People> getPeopleById(int id) {
+        return getResourceById(id, SwapiCategory.PEOPLE);
+    }
+
+    public Request<SwapiModelList<People>> getAllPeopleAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.PEOPLE);
+    }
+
+    public Request<Film> getFilmById(int id) {
+        return getResourceById(id, SwapiCategory.FILM);
+    }
+
+    public Request<SwapiModelList<Film>> getAllFilmsAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.FILM);
+    }
+
+    public Request<Starship> getStarshipById(int id) {
+        return getResourceById(id, SwapiCategory.STARSHIP);
+    }
+
+    public Request<SwapiModelList<Starship>> getAllStarshipsAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.STARSHIP);
+    }
+
+    public Request<Vehicle> getVehicleById(int id) {
+        return getResourceById(id, SwapiCategory.VEHICLE);
+    }
+
+    public Request<SwapiModelList<Vehicle>> getAllVehiclesAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.VEHICLE);
+    }
+
+    public Request<Species> getSpeciesById(int id) {
+        return getResourceById(id, SwapiCategory.SPECIES);
+    }
+
+    public Request<SwapiModelList<Species>> getAllSpeciesAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.SPECIES);
+    }
+
+    public Request<Planet> getPlanetById(int id) {
+        return getResourceById(id, SwapiCategory.PLANET);
+    }
+
+    public Request<SwapiModelList<Planet>> getAllPlanetsAtPage(int page) {
+        return getResourcesOfCategoryOnPage(page, SwapiCategory.PLANET);
+    }
+
+    private Request getResourceById(int id, SwapiCategory swapiCategory) {
 
         switch (swapiCategory) {
-            case FILMS:
-                return new RequestType(swapiService.getFilm(id));
+            case FILM:
+                return new Request(swapiService.getFilm(id));
             case PEOPLE:
-                return new RequestType(swapiService.getPeople(id));
-            case PLANETS:
-                return new RequestType(swapiService.getPlanet(id));
+                return new Request(swapiService.getPeople(id));
+            case PLANET:
+                return new Request(swapiService.getPlanet(id));
             case SPECIES:
-                return new RequestType(swapiService.getSpecies(id));
-            case VEHICLES:
-                return new RequestType(swapiService.getVehicle(id));
-            case STARSHIPS:
-                return new RequestType(swapiService.getStarship(id));
+                return new Request(swapiService.getSpecies(id));
+            case VEHICLE:
+                return new Request(swapiService.getVehicle(id));
+            case STARSHIP:
+                return new Request(swapiService.getStarship(id));
         }
 
         return null;
     }
 
-    private RequestType getResourcesOfCategoryOnPage(int page, SwapiCategory swapiCategory) {
+    public Request getResourcesOfCategoryOnPage(int page, SwapiCategory swapiCategory) {
         if (page < 1) {
             throw new InvalidParameterException("Page must be a number starting from 1");
         }
 
         switch (swapiCategory) {
-            case FILMS:
-                return new RequestType(swapiService.getAllFilms(page));
+            case FILM:
+                return new Request(swapiService.getAllFilms(page));
             case PEOPLE:
-                return new RequestType(swapiService.getAllPeople(page));
-            case PLANETS:
-                return new RequestType(swapiService.getAllPlanets(page));
+                return new Request(swapiService.getAllPeople(page));
+            case PLANET:
+                return new Request(swapiService.getAllPlanets(page));
             case SPECIES:
-                return new RequestType(swapiService.getAllSpecies(page));
-            case VEHICLES:
-                return new RequestType(swapiService.getAllVehicles(page));
-            case STARSHIPS:
-                return new RequestType(swapiService.getAllStarships(page));
+                return new Request(swapiService.getAllSpecies(page));
+            case VEHICLE:
+                return new Request(swapiService.getAllVehicles(page));
+            case STARSHIP:
+                return new Request(swapiService.getAllStarships(page));
         }
         return null;
     }
 
-    public RequestType<People> getPeopleById(int id) {
-        return getResourceById(id, SwapiCategory.PEOPLE);
-    }
-
-    public RequestType<Category<People>> getAllPeopleAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.PEOPLE);
-    }
-
-    public RequestType<Film> getFilmById(int id) {
-        return getResourceById(id, SwapiCategory.FILMS);
-    }
-
-    public RequestType<Category<Film>> getAllFilmsAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.FILMS);
-    }
-
-    public RequestType<Starship> getStarshipById(int id) {
-        return getResourceById(id, SwapiCategory.STARSHIPS);
-    }
-
-    public RequestType<Category<Starship>> getAllStarshipsAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.STARSHIPS);
-    }
-
-    public RequestType<Vehicle> getVehicleById(int id) {
-        return getResourceById(id, SwapiCategory.VEHICLES);
-    }
-
-    public RequestType<Category<Vehicle>> getAllVehiclesAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.VEHICLES);
-    }
-
-    public RequestType<Species> getSpeciesById(int id) {
-        return getResourceById(id, SwapiCategory.SPECIES);
-    }
-
-    public RequestType<Category<Species>> getAllSpeciesAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.SPECIES);
-    }
-
-    public RequestType<Planet> getPlanetById(int id) {
-        return getResourceById(id, SwapiCategory.PLANETS);
-    }
-
-    public RequestType<Category<Planet>> getAllPlanetsAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.PLANETS);
-    }
-
-    public class RequestType<T> {
+    public final class Request<T> {
         private Call<T> delegate;
 
-        public RequestType(Call<T> delegate) {
+        public Request(Call<T> delegate) {
             this.delegate = delegate;
         }
 
+        /**
+         * Use this method to perform a synchronous retrofit request.
+         * Cannot perform synchronous HTTP requests on the main thread.
+         * Must get executed on a new {@link Thread} or {@link android.os.AsyncTask}
+         *
+         * @return response body type
+         */
         public T sync() {
             try {
                 return delegate.execute().body();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.e(e.getMessage());
                 return null;
             }
         }
 
+        /**
+         * Use this method to perform an asynchronous retrofit request.
+         * Return {@link Call<T>} which you can use to cancel the request
+         *
+         * @param apiCallback
+         * @return {@link Call<T>}
+         */
         public Call<T> async(final StarWarsApiCallback<T> apiCallback) {
             delegate.enqueue(new Callback<T>() {
                 @Override
@@ -175,6 +198,10 @@ public class StarWarsApi implements Serializable {
             });
 
             return delegate;
+        }
+
+        public void loaderLoad(Context context, LoaderManager loaderManager, SwapiCategory swapiCategory, final StarWarsApiCallback<T> apiCallback) {
+            CustomLoader.load(context, loaderManager, 12, swapiCategory, apiCallback);
         }
     }
 }

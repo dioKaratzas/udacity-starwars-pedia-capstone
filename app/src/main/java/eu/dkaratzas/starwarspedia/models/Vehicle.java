@@ -12,8 +12,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
-public class Vehicle implements Parcelable {
+
+public class Vehicle extends SwapiModel implements Parcelable {
     @JsonProperty("max_atmosphering_speed")
     private String maxAtmospheringSpeed;
     @JsonProperty("cargo_capacity")
@@ -187,6 +189,21 @@ public class Vehicle implements Parcelable {
 
     public String getModel() {
         return model;
+    }
+
+    @Override
+    public int getId() {
+        return getIdFromUrl(url);
+    }
+
+    @Override
+    public String getTitle() {
+        return name;
+    }
+
+    @Override
+    public SwapiCategory getCategory() {
+        return SwapiCategory.VEHICLE;
     }
     //endregion
 }

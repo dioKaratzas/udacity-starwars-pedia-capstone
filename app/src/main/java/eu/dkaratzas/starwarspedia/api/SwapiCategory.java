@@ -1,10 +1,10 @@
 package eu.dkaratzas.starwarspedia.api;
 
 public enum SwapiCategory {
-    FILMS,
-    PLANETS,
+    FILM,
+    PLANET,
     SPECIES,
-    STARSHIPS,
-    VEHICLES,
+    STARSHIP,
+    VEHICLE,
     PEOPLE
 }
