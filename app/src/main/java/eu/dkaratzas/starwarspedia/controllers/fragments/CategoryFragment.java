@@ -24,6 +24,7 @@ import eu.dkaratzas.starwarspedia.adapters.CategoryAdapter;
 import eu.dkaratzas.starwarspedia.api.StarWarsApi;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+import eu.dkaratzas.starwarspedia.libs.Animations;
 import eu.dkaratzas.starwarspedia.libs.GridAutofitLayoutManager;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
@@ -153,6 +154,7 @@ public class CategoryFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(itemDecoration);
         mRecyclerView.setAdapter(categoryAdapter);
+        Animations.SlideInUpAnimation(mRecyclerView);
     }
 
     /**

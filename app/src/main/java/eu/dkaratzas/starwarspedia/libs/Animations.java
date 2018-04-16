@@ -16,7 +16,7 @@ public class Animations {
 
         Animator anim = ObjectAnimator.ofFloat(view, "translationY", distance, 0);
         anim.setInterpolator(new FastOutSlowInInterpolator());
-        anim.setDuration(500);
+        anim.setDuration(400);
         anim.start();
     }
 
@@ -26,7 +26,7 @@ public class Animations {
 
         Animator anim = ObjectAnimator.ofFloat(view, "translationY", 0, distance);
         anim.setInterpolator(new LinearOutSlowInInterpolator());
-        anim.setDuration(500);
+        anim.setDuration(400);
         anim.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
