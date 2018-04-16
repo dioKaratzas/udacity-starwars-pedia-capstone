@@ -1,6 +1,5 @@
 package eu.dkaratzas.starwarspedia.controllers.activities;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,19 +11,24 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
+import com.squareup.leakcanary.RefWatcher;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import eu.dkaratzas.starsgl.widget.StarView;
+import eu.dkaratzas.starwarspedia.GlobalApplication;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.controllers.fragments.CategoryFragment;
 import eu.dkaratzas.starwarspedia.libs.Animations;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
+import eu.dkaratzas.starwarspedia.models.SwapiModel;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        CategoryFragment.OnCategoryClickedListener {
+        CategoryFragment.CategoryFragmentCallbacks {
 
     @BindView(R.id.starView)
     StarView mStarView;
@@ -67,6 +71,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        RefWatcher refWatcher = GlobalApplication.getRefWatcher(this);
+        refWatcher.watch(this);
+
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -101,15 +113,26 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onCategoryClicked(Uri uri) {
 
+    @Override
+    public void onCategoryItemClicked(SwapiModel swapiModel) {
+        Logger.d(swapiModel.toString());
+    }
+
+    @Override
+    public void onCategoryDataLoading(boolean loading) {
+        if (loading)
+            mStarView.setSpeedFastTraveling();
+        else
+            mStarView.setSpeedNormal();
     }
 
     private void showCategory(SwapiCategory category) {
+        // Destroy the Loader of the fragment
+        getSupportLoaderManager().destroyLoader(CategoryFragment.LOADER_ID);
         getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_downward, 0, R.anim.slide_downward, 0)
-                .add(R.id.container, CategoryFragment.newInstance(category), "greetings")
+                .setCustomAnimations(R.anim.slide_upward_in, R.anim.slide_down_out, R.anim.slide_upward_in, R.anim.slide_down_out)
+                .replace(R.id.container, CategoryFragment.newInstance(category))
                 .commit();
     }
 

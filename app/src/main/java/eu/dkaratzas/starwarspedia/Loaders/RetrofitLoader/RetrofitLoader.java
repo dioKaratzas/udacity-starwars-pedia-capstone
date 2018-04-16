@@ -1,4 +1,4 @@
-package eu.dkaratzas.starwarspedia.libs.RetrofitLoader;
+package eu.dkaratzas.starwarspedia.Loaders.RetrofitLoader;
 
 
 import android.content.Context;

@@ -2,6 +2,8 @@ package eu.dkaratzas.starwarspedia.api;
 
 import android.content.Context;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.util.Log;
 
 import com.orhanobut.logger.Logger;
 
@@ -10,14 +12,9 @@ import java.io.Serializable;
 import java.security.InvalidParameterException;
 
 import eu.dkaratzas.starwarspedia.Constants;
-import eu.dkaratzas.starwarspedia.libs.RetrofitLoader.CustomLoader;
-import eu.dkaratzas.starwarspedia.models.Film;
-import eu.dkaratzas.starwarspedia.models.People;
-import eu.dkaratzas.starwarspedia.models.Planet;
-import eu.dkaratzas.starwarspedia.models.Species;
-import eu.dkaratzas.starwarspedia.models.Starship;
+import eu.dkaratzas.starwarspedia.Loaders.CategoryLoader;
+import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
-import eu.dkaratzas.starwarspedia.models.Vehicle;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,55 +55,15 @@ public class StarWarsApi implements Serializable {
         return sharedInstance;
     }
 
-    public Request<People> getPeopleById(int id) {
-        return getResourceById(id, SwapiCategory.PEOPLE);
+    public ApiLoader<SwapiModelList<SwapiModel>> getAllCategoryItems(SwapiCategory swapiCategory) {
+        return new ApiLoader<>(swapiCategory);
     }
 
-    public Request<SwapiModelList<People>> getAllPeopleAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.PEOPLE);
+    public Request<SwapiModel> getCategoryItemById(int id, SwapiCategory swapiCategory) {
+        return getItemRequestOnCategoryById(id, SwapiCategory.PEOPLE);
     }
 
-    public Request<Film> getFilmById(int id) {
-        return getResourceById(id, SwapiCategory.FILM);
-    }
-
-    public Request<SwapiModelList<Film>> getAllFilmsAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.FILM);
-    }
-
-    public Request<Starship> getStarshipById(int id) {
-        return getResourceById(id, SwapiCategory.STARSHIP);
-    }
-
-    public Request<SwapiModelList<Starship>> getAllStarshipsAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.STARSHIP);
-    }
-
-    public Request<Vehicle> getVehicleById(int id) {
-        return getResourceById(id, SwapiCategory.VEHICLE);
-    }
-
-    public Request<SwapiModelList<Vehicle>> getAllVehiclesAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.VEHICLE);
-    }
-
-    public Request<Species> getSpeciesById(int id) {
-        return getResourceById(id, SwapiCategory.SPECIES);
-    }
-
-    public Request<SwapiModelList<Species>> getAllSpeciesAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.SPECIES);
-    }
-
-    public Request<Planet> getPlanetById(int id) {
-        return getResourceById(id, SwapiCategory.PLANET);
-    }
-
-    public Request<SwapiModelList<Planet>> getAllPlanetsAtPage(int page) {
-        return getResourcesOfCategoryOnPage(page, SwapiCategory.PLANET);
-    }
-
-    private Request getResourceById(int id, SwapiCategory swapiCategory) {
+    public Request getItemRequestOnCategoryById(int id, SwapiCategory swapiCategory) {
 
         switch (swapiCategory) {
             case FILM:
@@ -126,7 +83,7 @@ public class StarWarsApi implements Serializable {
         return null;
     }
 
-    public Request getResourcesOfCategoryOnPage(int page, SwapiCategory swapiCategory) {
+    public Request getItemsRequestOnCategoryById(int page, SwapiCategory swapiCategory) {
         if (page < 1) {
             throw new InvalidParameterException("Page must be a number starting from 1");
         }
@@ -165,8 +122,8 @@ public class StarWarsApi implements Serializable {
         public T sync() {
             try {
                 return delegate.execute().body();
-            } catch (IOException e) {
-                Logger.e(e.getMessage());
+            } catch (IOException ex) {
+                Logger.e(Log.getStackTraceString(ex));
                 return null;
             }
         }
@@ -199,9 +156,17 @@ public class StarWarsApi implements Serializable {
 
             return delegate;
         }
+    }
 
-        public void loaderLoad(Context context, LoaderManager loaderManager, SwapiCategory swapiCategory, final StarWarsApiCallback<T> apiCallback) {
-            CustomLoader.load(context, loaderManager, 12, swapiCategory, apiCallback);
+    public final class ApiLoader<T> {
+        private SwapiCategory mSwapiCategory;
+
+        public ApiLoader(SwapiCategory swapiCategory) {
+            this.mSwapiCategory = swapiCategory;
+        }
+
+        public Loader<T> loaderLoad(Context context, LoaderManager loaderManager, int loaderId, final StarWarsApiCallback<T> apiCallback) {
+            return CategoryLoader.reload(context, loaderManager, loaderId, mSwapiCategory, apiCallback);
         }
     }
 }
