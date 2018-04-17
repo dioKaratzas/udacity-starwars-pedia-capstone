@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class People implements Parcelable {
+import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+
+public class People extends SwapiModel implements Parcelable {
     @JsonProperty("films")
     private List<String> films;
     @JsonProperty("homeworld")
@@ -205,6 +207,21 @@ public class People implements Parcelable {
                 ", name='" + name + '\'' +
                 ", height='" + height + '\'' +
                 '}';
+    }
+
+    @Override
+    public int getId() {
+        return getIdFromUrl(url);
+    }
+
+    @Override
+    public String getTitle() {
+        return name;
+    }
+
+    @Override
+    public SwapiCategory getCategory() {
+        return SwapiCategory.PEOPLE;
     }
 
     //endregion

@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Species implements Parcelable {
+import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+
+public class Species extends SwapiModel implements Parcelable {
     @JsonProperty("films")
     private List<String> films;
     @JsonProperty("skin_colors")
@@ -173,6 +175,21 @@ public class Species implements Parcelable {
 
     public String getAverageLifespan() {
         return averageLifespan;
+    }
+
+    @Override
+    public int getId() {
+        return getIdFromUrl(url);
+    }
+
+    @Override
+    public String getTitle() {
+        return getName();
+    }
+
+    @Override
+    public SwapiCategory getCategory() {
+        return SwapiCategory.SPECIES;
     }
     //endregion
 }

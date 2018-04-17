@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Category<T> implements Parcelable {
+public class SwapiModelList<T> implements Parcelable {
     @JsonProperty("next")
     private String next;
     @JsonProperty("previous")
@@ -19,11 +19,18 @@ public class Category<T> implements Parcelable {
     @JsonProperty("results")
     public List<T> results;
 
-    public Category() {
+    public SwapiModelList() {
         this.next = "";
         this.previous = "";
         this.count = 0;
         this.results = new ArrayList<>();
+    }
+
+    public SwapiModelList(String next, String previous, int count, List<T> results) {
+        this.next = next;
+        this.previous = previous;
+        this.count = count;
+        this.results = results;
     }
 
     public boolean hasMore() {
@@ -43,21 +50,21 @@ public class Category<T> implements Parcelable {
         dest.writeInt(this.count);
     }
 
-    protected Category(Parcel in) {
+    protected SwapiModelList(Parcel in) {
         this.next = in.readString();
         this.previous = in.readString();
         this.count = in.readInt();
     }
 
-    public static final Creator<Category> CREATOR = new Creator<Category>() {
+    public static final Creator<SwapiModelList> CREATOR = new Creator<SwapiModelList>() {
         @Override
-        public Category createFromParcel(Parcel source) {
-            return new Category(source);
+        public SwapiModelList createFromParcel(Parcel source) {
+            return new SwapiModelList(source);
         }
 
         @Override
-        public Category[] newArray(int size) {
-            return new Category[size];
+        public SwapiModelList[] newArray(int size) {
+            return new SwapiModelList[size];
         }
     };
     //endregion
@@ -80,5 +87,12 @@ public class Category<T> implements Parcelable {
         return results;
     }
 
+    public int getPageCount() {
+        return (int) Math.max(1, (long) Math.ceil((double) (count) / 10));
+    }
+
+    public boolean gotAnotherPage() {
+        return next != null;
+    }
     //endregion
 }
