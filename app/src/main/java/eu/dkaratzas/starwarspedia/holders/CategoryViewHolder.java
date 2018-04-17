@@ -8,12 +8,12 @@ import android.widget.TextView;
 import eu.dkaratzas.starwarspedia.R;
 
 public class CategoryViewHolder extends RecyclerView.ViewHolder {
-    public ImageView mIvPoster;
+    public ImageView mIvThumb;
     public TextView mTitle;
 
     public CategoryViewHolder(View itemView) {
         super(itemView);
         mTitle = itemView.findViewById(R.id.tvTitle);
-        mIvPoster = itemView.findViewById(R.id.ivPoster);
+        mIvThumb = itemView.findViewById(R.id.ivThumb);
     }
 }

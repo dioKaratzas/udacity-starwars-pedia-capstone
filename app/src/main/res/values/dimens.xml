@@ -23,11 +23,16 @@
 
     <!-- fragment_category -->
     <dimen name="greetings_text_margin_top">16dp</dimen>
-    <dimen name="category_recycler_container_margin_top">8dp</dimen>
-    <dimen name="category_recycler_container_left_right_padding">16dp</dimen>
-    <dimen name="item_offset">30dp</dimen>
-    <dimen name="poster_image_width">250dp</dimen>
+    <dimen name="recycler_margin_top">8dp</dimen>
+    <dimen name="category_recycler_item_offset">30dp</dimen>
+    <dimen name="refresh_image_width_height">76dp</dimen>
+    <dimen name="status_container_max_width">500dp</dimen>
+
+    <!-- category_item -->
+    <dimen name="thumb_image_height">250dp</dimen>
+    <dimen name="item_title_padding">8dp</dimen>
 
     <!-- status_layout -->
     <dimen name="yoda_image_min_height">90dp</dimen>
+
 </resources>

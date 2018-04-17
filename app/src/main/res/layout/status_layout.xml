@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/statusMessageContainer"
-    app:cardBackgroundColor="@color/cardViewSemiTransparent">
+    app:cardBackgroundColor="@color/colorPrimary">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:layout_height="0dp"
             android:contentDescription="@string/yoda"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/glFortyPercent"
+            app:layout_constraintEnd_toStartOf="@+id/glFortyPercentV"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_yoda" />
@@ -45,7 +45,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.constraint.Guideline
-            android:id="@+id/glFortyPercent"
+            android:id="@+id/glFortyPercentV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"

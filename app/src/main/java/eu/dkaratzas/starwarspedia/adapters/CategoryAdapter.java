@@ -46,7 +46,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
         });
         GlideApp.with(mContext)
                 .load(swapiModel.getImageStorageReference())
-                .into(holder.mIvPoster);
+                .into(holder.mIvThumb);
     }
 
     @Override
@@ -55,6 +55,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(SwapiModel swapiModel);
+        void onItemClick(SwapiModel swapiModel);
     }
 }

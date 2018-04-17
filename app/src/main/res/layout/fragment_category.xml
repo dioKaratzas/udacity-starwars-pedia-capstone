@@ -7,7 +7,7 @@
     tools:context=".controllers.fragments.CategoryFragment">
 
     <TextView
-        android:id="@+id/greetings"
+        android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -24,18 +24,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/ivRefresh"
+        android:layout_width="@dimen/refresh_image_width_height"
+        android:layout_height="@dimen/refresh_image_width_height"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_refresh" />
+
     <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/avi"
         style="@style/AVLoadingIndicatorView.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:indicatorColor="@color/colorAccent"
         app:indicatorName="LineScalePulseOutIndicator"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -43,22 +49,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/recyclerContainer"
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvCategory"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/category_recycler_container_margin_top"
-        android:paddingLeft="@dimen/category_recycler_container_left_right_padding"
-        android:paddingRight="@dimen/category_recycler_container_left_right_padding"
+        android:layout_marginTop="@dimen/recycler_margin_top"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/greetings">
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvCategory"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+    <include
+        layout="@layout/status_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:layout_marginStart="@dimen/margin_large"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/status_container_max_width" />
 
 </android.support.constraint.ConstraintLayout>

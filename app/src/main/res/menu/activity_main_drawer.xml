@@ -7,7 +7,7 @@
         <item
             android:id="@+id/nav_people"
             android:icon="@drawable/ic_vader"
-            android:title="@string/characters" />
+            android:title="@string/people" />
         <item
             android:id="@+id/nav_species"
             android:icon="@drawable/ic_wookiee"

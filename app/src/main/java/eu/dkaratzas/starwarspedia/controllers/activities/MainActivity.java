@@ -5,11 +5,9 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.RefWatcher;
@@ -21,7 +19,6 @@ import eu.dkaratzas.starwarspedia.GlobalApplication;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.controllers.fragments.CategoryFragment;
-import eu.dkaratzas.starwarspedia.libs.Animations;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
@@ -40,10 +37,8 @@ public class MainActivity extends AppCompatActivity
     DrawerLayout mDrawerLayout;
     @BindView(R.id.ivDrawerMenu)
     CustomDrawerButton mDrawerButton;
-    @BindView(R.id.statusMessageContainer)
-    CardView mStatusMessageContainer;
-    @BindView(R.id.tvStatusMessage)
-    TextView mTvStatusMessage;
+
+    private int selectedItemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,21 +89,25 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_people) {
-            showCategory(SwapiCategory.PEOPLE);
-        } else if (id == R.id.nav_films) {
-            showCategory(SwapiCategory.FILM);
-        } else if (id == R.id.nav_sparships) {
-            showCategory(SwapiCategory.STARSHIP);
-        } else if (id == R.id.nav_vehicles) {
-            showCategory(SwapiCategory.VEHICLE);
-        } else if (id == R.id.nav_species) {
-            showCategory(SwapiCategory.SPECIES);
-        } else if (id == R.id.nav_planets) {
-            showCategory(SwapiCategory.PLANET);
+        if (selectedItemId != id) {
 
+            selectedItemId = id;
+
+            if (id == R.id.nav_people) {
+                showCategory(SwapiCategory.PEOPLE);
+            } else if (id == R.id.nav_films) {
+                showCategory(SwapiCategory.FILM);
+            } else if (id == R.id.nav_sparships) {
+                showCategory(SwapiCategory.STARSHIP);
+            } else if (id == R.id.nav_vehicles) {
+                showCategory(SwapiCategory.VEHICLE);
+            } else if (id == R.id.nav_species) {
+                showCategory(SwapiCategory.SPECIES);
+            } else if (id == R.id.nav_planets) {
+                showCategory(SwapiCategory.PLANET);
+
+            }
         }
-
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -134,15 +133,6 @@ public class MainActivity extends AppCompatActivity
                 .setCustomAnimations(R.anim.slide_upward_in, R.anim.slide_down_out, R.anim.slide_upward_in, R.anim.slide_down_out)
                 .replace(R.id.container, CategoryFragment.newInstance(category))
                 .commit();
-    }
-
-    private void showStatus(String message) {
-        mTvStatusMessage.setText(message);
-        Animations.SlideInUpAnimation(mStatusMessageContainer);
-    }
-
-    private void hideStatus() {
-        Animations.SlideOutDownAnimation(mStatusMessageContainer);
     }
 
     private void selectDefaultCategory() {
