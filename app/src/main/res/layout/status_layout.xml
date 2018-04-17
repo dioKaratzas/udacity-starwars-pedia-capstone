@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tool="http://schemas.android.com/tools"
     android:id="@+id/statusMessageContainer"
     app:cardBackgroundColor="@color/colorPrimary">
 
@@ -35,10 +36,10 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-thin"
-            android:text="@string/no_internet"
+            tool:text="@string/no_internet"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/text_extra_large"
+            android:textSize="@dimen/status_message_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ivYoda"

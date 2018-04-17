@@ -103,7 +103,6 @@ public class CategoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_category, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-        setLoadingStatus(false);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_DATA_KEY)) {
             mData = savedInstanceState.getParcelable(BUNDLE_DATA_KEY);
@@ -112,8 +111,11 @@ public class CategoryFragment extends Fragment {
             if (savedInstanceState.containsKey(BUNDLE_RECYCLER_POSITION)) {
                 position = savedInstanceState.getInt(BUNDLE_RECYCLER_POSITION);
             }
+
+            mTvTitle.setText(mCategory.toString(getContext()));
             setUpRecycler(position);
         } else {
+            setLoadingStatus(false);
             loadData();
         }
 
@@ -123,6 +125,8 @@ public class CategoryFragment extends Fragment {
                 loadData();
             }
         });
+
+
 
         return view;
     }

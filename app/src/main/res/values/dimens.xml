@@ -34,5 +34,6 @@
 
     <!-- status_layout -->
     <dimen name="yoda_image_min_height">90dp</dimen>
+    <dimen name="status_message_text">16sp</dimen>
 
 </resources>
