@@ -4,9 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
-
-import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -21,6 +18,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import timber.log.Timber;
 
 /**
  * StarWarsApi Singleton Class
@@ -87,7 +85,7 @@ public class StarWarsApi implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public Request getItemsRequestOnCategoryById(int page, SwapiCategory swapiCategory) {
+    public Request<SwapiModelList<SwapiModel>> getItemsRequestOnCategoryById(int page, SwapiCategory swapiCategory) {
         if (page < 1) {
             throw new InvalidParameterException("Page must be a number starting from 1");
         }
@@ -127,7 +125,7 @@ public class StarWarsApi implements Serializable {
             try {
                 return delegate.execute().body();
             } catch (IOException ex) {
-                Logger.e(Log.getStackTraceString(ex));
+                Timber.e(ex);
                 return null;
             }
         }
@@ -149,10 +147,10 @@ public class StarWarsApi implements Serializable {
                 @Override
                 public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
                     if (call.isCanceled()) {
-                        Logger.d("Request was cancelled");
+                        Timber.d("Request was cancelled");
                         apiCallback.onCancel();
                     } else {
-                        Logger.e(t.getMessage());
+                        Timber.e(t);
                         apiCallback.onResponse(null);
                     }
                 }
@@ -169,7 +167,7 @@ public class StarWarsApi implements Serializable {
             this.mSwapiCategory = swapiCategory;
         }
 
-        public Loader<T> loaderLoad(Context context, LoaderManager loaderManager, int loaderId, final StarWarsApiCallback<T> apiCallback) {
+        public Loader loaderLoad(Context context, LoaderManager loaderManager, int loaderId, final StarWarsApiCallback<T> apiCallback) {
             return CategoryLoader.reload(context, loaderManager, loaderId, mSwapiCategory, apiCallback);
         }
     }

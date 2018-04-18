@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.BindView;
@@ -23,6 +22,7 @@ import eu.dkaratzas.starwarspedia.controllers.fragments.CategoryFragment;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCategoryItemClicked(SwapiModel swapiModel) {
-        Logger.d(swapiModel.toString());
+        Timber.d(String.valueOf(swapiModel));
     }
 
     @Override

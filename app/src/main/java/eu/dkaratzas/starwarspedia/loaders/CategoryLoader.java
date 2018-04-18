@@ -10,78 +10,53 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import com.orhanobut.logger.Logger;
-
 import eu.dkaratzas.starwarspedia.api.StarWarsApi;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
+import timber.log.Timber;
 
-public class CategoryLoader<T> extends AsyncTaskLoader<T> {
+public class CategoryLoader extends AsyncTaskLoader<SwapiModelList<SwapiModel>> {
     private SwapiCategory mSwapiCategory;
-    private T mResult;
-
-    public static <T> Loader<T> load(Context context, LoaderManager manager,
-                                     int id, SwapiCategory swapiCategory, StarWarsApiCallback<T> apiCallback) {
-        return manager.initLoader(id, null, new LoaderCallbacksDelegator<>(context, swapiCategory, apiCallback));
-    }
-
-
-    public static <T> Loader<T> reload(Context context, LoaderManager manager,
-                                       int id, SwapiCategory swapiCategory, StarWarsApiCallback<T> apiCallback) {
-        return manager.restartLoader(id, null, new LoaderCallbacksDelegator<>(context, swapiCategory, apiCallback));
-    }
-
-    static class LoaderCallbacksDelegator<T> implements LoaderManager.LoaderCallbacks<T> {
-        private final Context mContext;
-        private final SwapiCategory mSwapiCategory;
-        private final StarWarsApiCallback<T> mCallback;
-
-        LoaderCallbacksDelegator(Context context, SwapiCategory swapiCategory, StarWarsApiCallback<T> apiCallback) {
-            this.mContext = context;
-            this.mSwapiCategory = swapiCategory;
-            this.mCallback = apiCallback;
-        }
-
-
-        @NonNull
-        @Override
-        public Loader<T> onCreateLoader(int id, @Nullable Bundle args) {
-            return new CategoryLoader<>(mContext, mSwapiCategory);
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<T> loader, T data) {
-            mCallback.onResponse(data);
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<T> loader) {
-            mCallback.onCancel();
-        }
-    }
+    private SwapiModelList<SwapiModel> mResult;
 
     public CategoryLoader(Context context, SwapiCategory swapiCategory) {
         super(context);
         mSwapiCategory = swapiCategory;
     }
 
-    @SuppressWarnings("unchecked")
+    public static <T> Loader load(Context context, LoaderManager manager,
+                                  int id, SwapiCategory swapiCategory, StarWarsApiCallback<T> apiCallback) {
+        return manager.initLoader(id, null, new CategoryLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
+    }
+
+
+    public static <T> Loader reload(Context context, LoaderManager manager,
+                                    int id, SwapiCategory swapiCategory, StarWarsApiCallback<T> apiCallback) {
+        return manager.restartLoader(id, null, new CategoryLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
+    }
+
+    @Nullable
     @Override
-    public T loadInBackground() {
+    public SwapiModelList<SwapiModel> loadInBackground() {
         int currentPage = 1;
         boolean gotAnotherPage;
-        SwapiModelList<T> result = null;
-        do try {
-            result = mapResult(result, (SwapiModelList<T>) StarWarsApi.getApi().getItemsRequestOnCategoryById(currentPage, mSwapiCategory).sync());
-            currentPage++;
-            gotAnotherPage = result.gotAnotherPage();
-        } catch (ClassCastException ex) {
-            Logger.e(Log.getStackTraceString(ex));
-            return null;
+        SwapiModelList<SwapiModel> result = null;
+        do {
+            try {
+                result = mapResult(result, StarWarsApi.getApi().getItemsRequestOnCategoryById(currentPage, mSwapiCategory).sync());
+                currentPage++;
+                gotAnotherPage = result.gotAnotherPage();
+            } catch (Exception ex) {
+                Timber.e(Log.getStackTraceString(ex));
+                return null;
+            }
+
+
         } while (gotAnotherPage);
 
-        return (T) result;
+        return result;
     }
 
     @Override
@@ -108,7 +83,7 @@ public class CategoryLoader<T> extends AsyncTaskLoader<T> {
     }
 
     @Override
-    public void deliverResult(T result) {
+    public void deliverResult(SwapiModelList<SwapiModel> result) {
         if (isReset()) {
             // The loader was reset while stopped
             return;
@@ -119,7 +94,8 @@ public class CategoryLoader<T> extends AsyncTaskLoader<T> {
         }
     }
 
-    private SwapiModelList<T> mapResult(SwapiModelList<T> result, SwapiModelList<T> newResult) {
+
+    private SwapiModelList<SwapiModel> mapResult(SwapiModelList<SwapiModel> result, SwapiModelList<SwapiModel> newResult) {
         if (result == null) {
             result = newResult;
         } else {
@@ -129,5 +105,34 @@ public class CategoryLoader<T> extends AsyncTaskLoader<T> {
 
         }
         return result;
+    }
+
+    static class LoaderCallbacksDelegator implements LoaderManager.LoaderCallbacks {
+
+        private final Context mContext;
+        private final SwapiCategory mSwapiCategory;
+        private final StarWarsApiCallback mCallback;
+
+        LoaderCallbacksDelegator(Context context, SwapiCategory swapiCategory, StarWarsApiCallback apiCallback) {
+            this.mContext = context;
+            this.mSwapiCategory = swapiCategory;
+            this.mCallback = apiCallback;
+        }
+
+        @NonNull
+        @Override
+        public Loader onCreateLoader(int id, @Nullable Bundle args) {
+            return new CategoryLoader(mContext, mSwapiCategory);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader loader, Object data) {
+            mCallback.onResponse(data);
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader loader) {
+
+        }
     }
 }

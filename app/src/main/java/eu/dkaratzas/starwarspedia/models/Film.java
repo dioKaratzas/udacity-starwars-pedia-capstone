@@ -112,25 +112,6 @@ public class Film extends SwapiModel implements Parcelable {
     //endregion
 
     //region Getters
-    public String getEdited() {
-        return edited;
-    }
-
-    public String getDirector() {
-        return director;
-    }
-
-    public String getCreated() {
-        return created;
-    }
-
-    public List<String> getVehicles() {
-        return vehicles;
-    }
-
-    public String getOpeningCrawl() {
-        return openingCrawl;
-    }
 
     @Override
     public int getId() {
@@ -147,36 +128,5 @@ public class Film extends SwapiModel implements Parcelable {
         return SwapiCategory.FILM;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public List<String> getCharacters() {
-        return characters;
-    }
-
-    public int getEpisodeId() {
-        return episodeId;
-    }
-
-    public List<String> getPlanets() {
-        return planets;
-    }
-
-    public String getReleaseDate() {
-        return releaseDate;
-    }
-
-    public List<String> getStarships() {
-        return starships;
-    }
-
-    public List<String> getSpecies() {
-        return species;
-    }
-
-    public String getProducer() {
-        return producer;
-    }
     //endregion
 }

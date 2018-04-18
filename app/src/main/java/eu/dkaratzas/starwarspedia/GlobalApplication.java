@@ -3,10 +3,10 @@ package eu.dkaratzas.starwarspedia;
 import android.app.Application;
 import android.content.Context;
 
-import com.orhanobut.logger.AndroidLogAdapter;
-import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
+
+import timber.log.Timber;
 
 public class GlobalApplication extends Application {
     private RefWatcher refWatcher;
@@ -22,12 +22,9 @@ public class GlobalApplication extends Application {
         }
         refWatcher = LeakCanary.install(this);
 
-        Logger.addLogAdapter(new AndroidLogAdapter() {
-            @Override
-            public boolean isLoggable(int priority, String tag) {
-                return BuildConfig.DEBUG;
-            }
-        });
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
     }
 
     public static RefWatcher getRefWatcher(Context context) {

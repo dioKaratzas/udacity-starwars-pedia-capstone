@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.RefWatcher;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -35,6 +34,7 @@ import eu.dkaratzas.starwarspedia.libs.animations.techniques.PulseAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
+import timber.log.Timber;
 
 /**
  * Displays the selected category content of the SwapiModel API.
@@ -164,7 +164,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Logger.d("onDestroy");
+        Timber.d("onDestroy");
         RefWatcher refWatcher = GlobalApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);
     }

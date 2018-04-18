@@ -7,12 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
-
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.libs.animations.YoYo;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideOutDownAnimator;
+import timber.log.Timber;
 
 public class StatusMessage {
     private static volatile StatusMessage sharedInstance;
@@ -86,7 +85,7 @@ public class StatusMessage {
     }
 
     private void hideMessage() {
-        if (mContainer != null) {
+        if (mContainer != null && mContainer.getParent() != null) {
             YoYo.with(new SlideOutDownAnimator())
                     .duration(ANIMATION_DURATION)
                     .onEnd(new YoYo.AnimatorCallback() {
@@ -102,7 +101,8 @@ public class StatusMessage {
     private void removeView() {
         if (mContainer != null && mContainer.getParent() != null) {
             ((ViewGroup) mContainer.getParent()).removeView(mContainer);
-            Logger.d("Removed status message container");
+            mContainer = null;
+            Timber.d("Removed status message container");
         }
     }
 }
