@@ -1,4 +1,4 @@
-package eu.dkaratzas.starwarspedia.Loaders.RetrofitLoader;
+package eu.dkaratzas.starwarspedia.loaders.RetrofitLoader;
 
 
 import android.content.Context;
@@ -30,7 +30,7 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
      */
     public static <T> void load(Context context, LoaderManager manager,
                                 int id, Call<T> call, Callback<T> callback) {
-        manager.initLoader(id, null, new LoaderCallbacksDelegator<T>(
+        manager.initLoader(id, null, new LoaderCallbacksDelegator<>(
                 context, call, callback));
     }
 
@@ -48,7 +48,7 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
      */
     public static <T> void reload(Context context, LoaderManager manager,
                                   int id, Call<T> call, Callback<T> callback) {
-        manager.restartLoader(id, null, new LoaderCallbacksDelegator<T>(
+        manager.restartLoader(id, null, new LoaderCallbacksDelegator<>(
                 context, call, callback));
     }
 
@@ -68,7 +68,7 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
         @Override
         public Loader<ResultHolder<T>> onCreateLoader(
                 int id, Bundle args) {
-            return new RetrofitLoader<T>(context, call);
+            return new RetrofitLoader<>(context, call);
         }
 
         @Override
@@ -184,7 +184,7 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
 
         @Override
         public void onResponse(Call<T> call, Response<T> response) {
-            onResult(new ResultHolder.ResponseHolder<T>(response));
+            onResult(new ResultHolder.ResponseHolder<>(response));
         }
 
         @Override

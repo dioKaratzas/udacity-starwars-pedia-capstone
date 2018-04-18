@@ -22,8 +22,8 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:layout_marginTop="32dp">
+            android:layout_marginBottom="@dimen/margin_extra_extra_large"
+            android:layout_marginTop="@dimen/margin_extra_extra_large">
 
             <ImageView
                 android:id="@+id/ivYoda"
@@ -41,12 +41,12 @@
                 android:id="@+id/tvStatusMessage"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginBottom="@dimen/status_message_margin"
+                android:layout_marginEnd="@dimen/status_message_margin"
+                android:layout_marginLeft="@dimen/status_message_margin"
+                android:layout_marginRight="@dimen/status_message_margin"
+                android:layout_marginStart="@dimen/status_message_margin"
+                android:layout_marginTop="@dimen/status_message_margin"
                 android:fontFamily="sans-serif-thin"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                 android:textColor="@android:color/white"

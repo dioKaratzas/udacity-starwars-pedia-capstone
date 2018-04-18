@@ -14,7 +14,7 @@ public enum SwapiCategory {
 
     private final int stringResourceId;
 
-    private SwapiCategory(int s) {
+    SwapiCategory(int s) {
         stringResourceId = s;
     }
 

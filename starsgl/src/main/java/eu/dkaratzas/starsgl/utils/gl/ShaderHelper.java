@@ -1,7 +1,6 @@
 package eu.dkaratzas.starsgl.utils.gl;
 
 import android.opengl.GLES20;
-import android.util.Log;
 
 import eu.dkaratzas.starsgl.interfaces.ShaderType;
 import timber.log.Timber;
@@ -80,7 +79,7 @@ public class ShaderHelper {
 
             // If the link failed, delete the program.
             if (linkStatus[0] == 0) {
-                Log.e(TAG, "Error compiling program: " + GLES20.glGetProgramInfoLog(programHandle));
+                Timber.e("Error compiling program: %s", GLES20.glGetProgramInfoLog(programHandle));
                 GLES20.glDeleteProgram(programHandle);
                 programHandle = 0;
             }

@@ -1,4 +1,4 @@
-package eu.dkaratzas.starwarspedia.Loaders.RetrofitLoader;
+package eu.dkaratzas.starwarspedia.loaders.RetrofitLoader;
 
 import retrofit2.Response;
 

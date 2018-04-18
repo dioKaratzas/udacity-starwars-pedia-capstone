@@ -36,7 +36,7 @@ public abstract class SwapiModel {
     }
 
     public int getIdFromUrl(String url) {
-        final String regex = "https.*\\/([0-9]+)\\/(?:&.)*";
+        final String regex = "https.*/([0-9]+)/(?:&.)*";
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(url);
 

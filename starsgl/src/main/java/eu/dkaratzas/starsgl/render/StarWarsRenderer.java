@@ -253,8 +253,7 @@ public class StarWarsRenderer implements GLSurfaceView.Renderer {
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        float value = (float) animation.getAnimatedValue();
-                        deltaPosX = value;
+                        deltaPosX = (float) animation.getAnimatedValue();
                         mGlSurfaceView.requestRender();
                     }
                 });

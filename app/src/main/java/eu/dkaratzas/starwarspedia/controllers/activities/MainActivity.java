@@ -1,6 +1,7 @@
 package eu.dkaratzas.starwarspedia.controllers.activities;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -93,19 +94,25 @@ public class MainActivity extends AppCompatActivity
 
             selectedItemId = id;
 
-            if (id == R.id.nav_people) {
-                showCategory(SwapiCategory.PEOPLE);
-            } else if (id == R.id.nav_films) {
-                showCategory(SwapiCategory.FILM);
-            } else if (id == R.id.nav_sparships) {
-                showCategory(SwapiCategory.STARSHIP);
-            } else if (id == R.id.nav_vehicles) {
-                showCategory(SwapiCategory.VEHICLE);
-            } else if (id == R.id.nav_species) {
-                showCategory(SwapiCategory.SPECIES);
-            } else if (id == R.id.nav_planets) {
-                showCategory(SwapiCategory.PLANET);
-
+            switch (id) {
+                case R.id.nav_people:
+                    showCategory(SwapiCategory.PEOPLE);
+                    break;
+                case R.id.nav_films:
+                    showCategory(SwapiCategory.FILM);
+                    break;
+                case R.id.nav_sparships:
+                    showCategory(SwapiCategory.STARSHIP);
+                    break;
+                case R.id.nav_vehicles:
+                    showCategory(SwapiCategory.VEHICLE);
+                    break;
+                case R.id.nav_species:
+                    showCategory(SwapiCategory.SPECIES);
+                    break;
+                case R.id.nav_planets:
+                    showCategory(SwapiCategory.PLANET);
+                    break;
             }
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);

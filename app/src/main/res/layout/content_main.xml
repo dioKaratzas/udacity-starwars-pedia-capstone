@@ -18,7 +18,8 @@
         app:layout_constraintEnd_toStartOf="@+id/glEightPercentV"
         app:layout_constraintStart_toStartOf="@+id/glTwentyPercentV"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_star_wars_logo" />
+        app:srcCompat="@drawable/ic_star_wars_logo"
+        android:contentDescription="@string/logo" />
 
     <FrameLayout
         android:id="@+id/container"

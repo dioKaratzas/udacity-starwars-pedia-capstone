@@ -2,6 +2,7 @@ package eu.dkaratzas.starwarspedia.libs;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.AppCompatImageView;
@@ -9,12 +10,14 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 
+import eu.dkaratzas.starwarspedia.R;
+
 import static android.support.v4.widget.DrawerLayout.STATE_SETTLING;
 
 public class CustomDrawerButton extends AppCompatImageView implements DrawerLayout.DrawerListener {
 
     private DrawerLayout mDrawerLayout;
-    private int side = Gravity.LEFT;
+    private int side = Gravity.START;
 
     public CustomDrawerButton(Context context) {
         super(context);
@@ -31,23 +34,25 @@ public class CustomDrawerButton extends AppCompatImageView implements DrawerLayo
     public void changeState() {
         if (mDrawerLayout.isDrawerOpen(side)) {
             mDrawerLayout.closeDrawer(side);
+            setContentDescription(getContext().getString(R.string.navigation_drawer_open));
         } else {
             mDrawerLayout.openDrawer(side);
+            setContentDescription(getContext().getString(R.string.navigation_drawer_close));
         }
     }
 
     @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
+    public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
 
     }
 
     @Override
-    public void onDrawerOpened(View drawerView) {
+    public void onDrawerOpened(@NonNull View drawerView) {
 
     }
 
     @Override
-    public void onDrawerClosed(View drawerView) {
+    public void onDrawerClosed(@NonNull View drawerView) {
 
     }
 

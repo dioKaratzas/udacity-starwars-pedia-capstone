@@ -43,7 +43,7 @@ public class TextureHelper {
             int errorCode = GLES20.glGetError();
             String errorString = GLUtils.getEGLErrorString(errorCode);
             RuntimeException e = new RuntimeException(errorCode + " " + errorString);
-            Timber.e(e, "");
+            Timber.e(e);
             throw e;
         }
 

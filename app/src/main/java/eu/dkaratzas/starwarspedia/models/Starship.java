@@ -53,7 +53,7 @@ public class Starship extends SwapiModel implements Parcelable {
         this.cargoCapacity = "";
         this.films = new ArrayList<>();
         this.passengers = "";
-        this.pilots = new ArrayList();
+        this.pilots = new ArrayList<>();
         this.edited = "";
         this.consumables = "";
         this.mGLT = "";

@@ -1,4 +1,4 @@
-package eu.dkaratzas.starwarspedia.Loaders;
+package eu.dkaratzas.starwarspedia.loaders;
 
 
 import android.content.Context;
@@ -66,23 +66,19 @@ public class CategoryLoader<T> extends AsyncTaskLoader<T> {
         mSwapiCategory = swapiCategory;
     }
 
-
+    @SuppressWarnings("unchecked")
     @Override
     public T loadInBackground() {
         int currentPage = 1;
         boolean gotAnotherPage;
         SwapiModelList<T> result = null;
-        do {
-            try {
-                result = mapResult(result, (SwapiModelList<T>) StarWarsApi.getApi().getItemsRequestOnCategoryById(currentPage, mSwapiCategory).sync());
-                currentPage++;
-                gotAnotherPage = result.gotAnotherPage();
-            } catch (Exception ex) {
-                Logger.e(Log.getStackTraceString(ex));
-                return null;
-            }
-
-
+        do try {
+            result = mapResult(result, (SwapiModelList<T>) StarWarsApi.getApi().getItemsRequestOnCategoryById(currentPage, mSwapiCategory).sync());
+            currentPage++;
+            gotAnotherPage = result.gotAnotherPage();
+        } catch (ClassCastException ex) {
+            Logger.e(Log.getStackTraceString(ex));
+            return null;
         } while (gotAnotherPage);
 
         return (T) result;

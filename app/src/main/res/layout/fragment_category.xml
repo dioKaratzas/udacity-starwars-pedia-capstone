@@ -34,7 +34,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_refresh" />
+        app:srcCompat="@drawable/ic_refresh"
+        android:contentDescription="@string/refresh" />
 
     <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/avi"
