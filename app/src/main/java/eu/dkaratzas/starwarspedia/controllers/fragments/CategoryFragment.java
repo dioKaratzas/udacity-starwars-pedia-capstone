@@ -6,7 +6,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
 import com.squareup.leakcanary.RefWatcher;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -28,11 +28,11 @@ import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.libs.GridAutofitLayoutManager;
 import eu.dkaratzas.starwarspedia.libs.Misc;
+import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.libs.animations.YoYo;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.FadeInAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.PulseAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
-import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideOutDownAnimator;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
 
@@ -49,10 +49,6 @@ public class CategoryFragment extends Fragment {
     RecyclerView mRecyclerView;
     @BindView(R.id.avi)
     AVLoadingIndicatorView mAvi;
-    @BindView(R.id.statusMessageContainer)
-    CardView mStatusMessageContainer;
-    @BindView(R.id.tvStatusMessage)
-    TextView mTvStatusMessage;
     @BindView(R.id.ivRefresh)
     ImageView mIvRefresh;
     @BindView(R.id.tvTitle)
@@ -127,7 +123,6 @@ public class CategoryFragment extends Fragment {
         });
 
 
-
         return view;
     }
 
@@ -169,6 +164,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Logger.d("onDestroy");
         RefWatcher refWatcher = GlobalApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);
     }
@@ -184,7 +180,7 @@ public class CategoryFragment extends Fragment {
                         @Override
                         public void onResponse(SwapiModelList<SwapiModel> result) {
                             if (result == null) {
-                                showStatus(getString(R.string.error_getting_data));
+                                StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
                             } else {
                                 mTvTitle.setText(mCategory.toString(getContext()));
                             }
@@ -202,7 +198,7 @@ public class CategoryFragment extends Fragment {
                         }
                     });
         } else {
-            showStatus(getResources().getString(R.string.no_internet));
+            StatusMessage.show(getActivity(), getResources().getString(R.string.no_internet));
         }
 
     }
@@ -213,7 +209,7 @@ public class CategoryFragment extends Fragment {
 
         if (loadingStatus) {
             // hide status message if is visible
-            hideStatus(0);
+//            hideStatus(0);
 
             // show loading indicator
             mAvi.smoothToShow();
@@ -262,33 +258,6 @@ public class CategoryFragment extends Fragment {
                     .duration(400)
                     .playOn(mRecyclerView);
         }
-    }
-
-    private void showStatus(String message) {
-        mTvStatusMessage.setText(message);
-
-        YoYo.with(new SlideInUpAnimator())
-                .duration(200)
-                .onEnd(new YoYo.AnimatorCallback() {
-                    @Override
-                    public void call(Animator animator) {
-                        hideStatus(4000);
-                    }
-                })
-                .playOn(mStatusMessageContainer);
-    }
-
-    private void hideStatus(int delay) {
-        YoYo.with(new SlideOutDownAnimator())
-                .duration(200)
-                .delay(delay)
-                .onEnd(new YoYo.AnimatorCallback() {
-                    @Override
-                    public void call(Animator animator) {
-                        mStatusMessageContainer.setVisibility(View.GONE);
-                    }
-                })
-                .playOn(mStatusMessageContainer);
     }
 
     /**
