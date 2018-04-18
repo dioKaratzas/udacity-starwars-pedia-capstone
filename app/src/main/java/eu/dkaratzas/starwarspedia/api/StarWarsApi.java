@@ -1,16 +1,12 @@
 package eu.dkaratzas.starwarspedia.api;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
 
 import eu.dkaratzas.starwarspedia.Constants;
-import eu.dkaratzas.starwarspedia.loaders.CategoryLoader;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
 import retrofit2.Call;
@@ -52,10 +48,6 @@ public class StarWarsApi implements Serializable {
         }
 
         return sharedInstance;
-    }
-
-    public ApiLoader<SwapiModelList<SwapiModel>> getAllCategoryItems(SwapiCategory swapiCategory) {
-        return new ApiLoader<>(swapiCategory);
     }
 
     @SuppressWarnings("unchecked")
@@ -157,18 +149,6 @@ public class StarWarsApi implements Serializable {
             });
 
             return delegate;
-        }
-    }
-
-    public final class ApiLoader<T> {
-        private SwapiCategory mSwapiCategory;
-
-        public ApiLoader(SwapiCategory swapiCategory) {
-            this.mSwapiCategory = swapiCategory;
-        }
-
-        public Loader loaderLoad(Context context, LoaderManager loaderManager, int loaderId, final StarWarsApiCallback<T> apiCallback) {
-            return CategoryLoader.reload(context, loaderManager, loaderId, mSwapiCategory, apiCallback);
         }
     }
 }

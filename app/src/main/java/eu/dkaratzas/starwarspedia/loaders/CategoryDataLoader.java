@@ -17,24 +17,24 @@ import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
 import timber.log.Timber;
 
-public class CategoryLoader extends AsyncTaskLoader<SwapiModelList<SwapiModel>> {
+public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiModel>> {
     private SwapiCategory mSwapiCategory;
     private SwapiModelList<SwapiModel> mResult;
 
-    public CategoryLoader(Context context, SwapiCategory swapiCategory) {
+    public CategoryDataLoader(Context context, SwapiCategory swapiCategory) {
         super(context);
         mSwapiCategory = swapiCategory;
     }
 
     public static <T> Loader load(Context context, LoaderManager manager,
-                                  int id, SwapiCategory swapiCategory, StarWarsApiCallback<T> apiCallback) {
-        return manager.initLoader(id, null, new CategoryLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
+                                  int id, SwapiCategory swapiCategory, StarWarsApiCallback<SwapiModelList<SwapiModel>> apiCallback) {
+        return manager.initLoader(id, null, new CategoryDataLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
     }
 
 
     public static <T> Loader reload(Context context, LoaderManager manager,
-                                    int id, SwapiCategory swapiCategory, StarWarsApiCallback<T> apiCallback) {
-        return manager.restartLoader(id, null, new CategoryLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
+                                    int id, SwapiCategory swapiCategory, StarWarsApiCallback<SwapiModelList<SwapiModel>> apiCallback) {
+        return manager.restartLoader(id, null, new CategoryDataLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
     }
 
     @Nullable
@@ -122,7 +122,7 @@ public class CategoryLoader extends AsyncTaskLoader<SwapiModelList<SwapiModel>> 
         @NonNull
         @Override
         public Loader onCreateLoader(int id, @Nullable Bundle args) {
-            return new CategoryLoader(mContext, mSwapiCategory);
+            return new CategoryDataLoader(mContext, mSwapiCategory);
         }
 
         @Override

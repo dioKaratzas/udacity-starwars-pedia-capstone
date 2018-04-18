@@ -22,7 +22,6 @@ import butterknife.Unbinder;
 import eu.dkaratzas.starwarspedia.GlobalApplication;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.adapters.CategoryAdapter;
-import eu.dkaratzas.starwarspedia.api.StarWarsApi;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.libs.GridAutofitLayoutManager;
@@ -32,6 +31,7 @@ import eu.dkaratzas.starwarspedia.libs.animations.YoYo;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.FadeInAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.PulseAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
+import eu.dkaratzas.starwarspedia.loaders.CategoryDataLoader;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
 import timber.log.Timber;
@@ -175,28 +175,28 @@ public class CategoryFragment extends Fragment {
         if (Misc.isNetworkAvailable(getActivity().getApplicationContext())) {
             setLoadingStatus(true);
 
-            StarWarsApi.getApi().getAllCategoryItems(mCategory)
-                    .loaderLoad(getContext(), getActivity().getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<SwapiModelList<SwapiModel>>() {
-                        @Override
-                        public void onResponse(SwapiModelList<SwapiModel> result) {
-                            if (result == null) {
-                                StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
-                            } else {
-                                mTvTitle.setText(mCategory.toString(getContext()));
-                            }
+            CategoryDataLoader.reload(getContext(), getActivity().getSupportLoaderManager(), LOADER_ID, mCategory, new StarWarsApiCallback<SwapiModelList<SwapiModel>>() {
+                @Override
+                public void onResponse(SwapiModelList<SwapiModel> result) {
+                    if (result == null) {
+                        StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
+                    } else {
+                        mTvTitle.setText(mCategory.toString(getContext()));
+                    }
 
-                            mData = result;
-                            getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
-                            setUpRecycler(0);
-                            setLoadingStatus(false);
-                        }
+                    mData = result;
+                    getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
+                    setUpRecycler(0);
+                    setLoadingStatus(false);
+                }
 
-                        @Override
-                        public void onCancel() {
-                            mListener.onCategoryDataLoading(false);
-                            mAvi.smoothToHide();
-                        }
-                    });
+                @Override
+                public void onCancel() {
+                    mListener.onCategoryDataLoading(false);
+                    mAvi.smoothToHide();
+                }
+            });
+
         } else {
             StatusMessage.show(getActivity(), getResources().getString(R.string.no_internet));
         }
