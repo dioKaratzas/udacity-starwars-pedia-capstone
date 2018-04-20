@@ -2,13 +2,14 @@ package eu.dkaratzas.starwarspedia.controllers.activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.squareup.leakcanary.RefWatcher;
 
@@ -30,14 +31,17 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.starView)
     StarView mStarView;
-    @BindView(R.id.ivLogo)
-    ImageView mIvLogo;
     @BindView(R.id.nav_view)
     NavigationView mNavView;
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @BindView(R.id.ivDrawerMenu)
     CustomDrawerButton mDrawerButton;
+    @BindView(R.id.mainContentLayout)
+    View mMainContent;
+    @Nullable
+    @BindView(R.id.appBar)
+    AppBarLayout mAppBar;
 
     private int selectedItemId;
 
@@ -47,7 +51,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        Misc.setTransparentForDrawerLayout(this, mDrawerLayout, mIvLogo);
+        Misc.setTransparentForDrawerLayout(this, mDrawerLayout, mMainContent);
 
         mDrawerButton.setDrawerLayout(mDrawerLayout);
         mDrawerButton.getDrawerLayout().addDrawerListener(mDrawerButton);
@@ -133,6 +137,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showCategory(SwapiCategory category) {
+        // if we are on small screen devices and AppBarLayout exists expand it
+        if (mAppBar != null)
+            mAppBar.setExpanded(true, true);
+
         // Destroy the Loader of the fragment
         getSupportLoaderManager().destroyLoader(CategoryFragment.LOADER_ID);
         getSupportFragmentManager().beginTransaction()

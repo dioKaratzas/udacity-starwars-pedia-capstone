@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +28,8 @@ public class Misc {
 
         ViewGroup contentLayout = (ViewGroup) drawerLayout.getChildAt(0);
 
-        if (viewToAddTopMargin != null && viewToAddTopMargin.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) viewToAddTopMargin.getLayoutParams();
+        if (viewToAddTopMargin != null && viewToAddTopMargin.getLayoutParams() instanceof DrawerLayout.LayoutParams) {
+            DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) viewToAddTopMargin.getLayoutParams();
 
             params.topMargin += getStatusBarHeight(activity.getApplicationContext());
             viewToAddTopMargin.setLayoutParams(params);
