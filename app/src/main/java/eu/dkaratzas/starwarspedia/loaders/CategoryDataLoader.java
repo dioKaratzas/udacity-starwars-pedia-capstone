@@ -107,16 +107,16 @@ public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiMode
         return result;
     }
 
-    static class LoaderCallbacksDelegator implements LoaderManager.LoaderCallbacks {
+    static class LoaderCallbacksDelegator implements LoaderManager.LoaderCallbacks<SwapiModelList<SwapiModel>> {
 
         private final Context mContext;
         private final SwapiCategory mSwapiCategory;
-        private final StarWarsApiCallback mCallback;
+        private final StarWarsApiCallback<SwapiModelList<SwapiModel>> mCallback;
 
-        LoaderCallbacksDelegator(Context context, SwapiCategory swapiCategory, StarWarsApiCallback apiCallback) {
+        public LoaderCallbacksDelegator(Context context, SwapiCategory swapiCategory, StarWarsApiCallback<SwapiModelList<SwapiModel>> callback) {
             this.mContext = context;
             this.mSwapiCategory = swapiCategory;
-            this.mCallback = apiCallback;
+            this.mCallback = callback;
         }
 
         @NonNull
@@ -126,7 +126,7 @@ public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiMode
         }
 
         @Override
-        public void onLoadFinished(@NonNull Loader loader, Object data) {
+        public void onLoadFinished(@NonNull Loader<SwapiModelList<SwapiModel>> loader, SwapiModelList<SwapiModel> data) {
             mCallback.onResponse(data);
         }
 
