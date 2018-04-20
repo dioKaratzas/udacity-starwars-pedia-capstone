@@ -1,5 +1,6 @@
 package eu.dkaratzas.starwarspedia.controllers.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,11 +24,8 @@ import eu.dkaratzas.starwarspedia.controllers.fragments.CategoryFragment;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
-import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        CategoryFragment.CategoryFragmentCallbacks {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CategoryFragment.CategoryFragmentCallbacks {
 
     @BindView(R.id.starView)
     StarView mStarView;
@@ -125,7 +123,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCategoryItemClicked(SwapiModel swapiModel) {
-        Timber.d(String.valueOf(swapiModel));
+        if (swapiModel != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, swapiModel);
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
     }
 
     @Override

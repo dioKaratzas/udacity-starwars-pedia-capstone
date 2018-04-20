@@ -29,7 +29,7 @@
     <dimen name="status_container_max_width">500dp</dimen>
     <item name="avi_constraint_vertical_bias" type="dimen">0.3</item>
 
-    <!-- category_item -->
+    <!-- item_category -->
     <dimen name="thumb_image_height">250dp</dimen>
     <dimen name="item_title_padding">8dp</dimen>
 

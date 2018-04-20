@@ -10,7 +10,7 @@ import java.util.List;
 
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
-public class Starship extends SwapiModel implements Parcelable {
+public class Starship extends SwapiModel {
     @JsonProperty("max_atmosphering_speed")
     private String maxAtmospheringSpeed;
     @JsonProperty("cargo_capacity")
@@ -49,6 +49,7 @@ public class Starship extends SwapiModel implements Parcelable {
     private String model;
 
     public Starship() {
+        super();
         this.maxAtmospheringSpeed = "";
         this.cargoCapacity = "";
         this.films = new ArrayList<>();
@@ -219,5 +220,30 @@ public class Starship extends SwapiModel implements Parcelable {
     public SwapiCategory getCategory() {
         return SwapiCategory.STARSHIP;
     }
+
+    @Override
+    public String toString() {
+        return "Starship{" +
+                "maxAtmospheringSpeed='" + maxAtmospheringSpeed + '\'' +
+                ", cargoCapacity='" + cargoCapacity + '\'' +
+                ", films=" + films +
+                ", passengers='" + passengers + '\'' +
+                ", pilots=" + pilots +
+                ", edited='" + edited + '\'' +
+                ", consumables='" + consumables + '\'' +
+                ", mGLT='" + mGLT + '\'' +
+                ", created='" + created + '\'' +
+                ", length='" + length + '\'' +
+                ", starshipClass='" + starshipClass + '\'' +
+                ", url='" + url + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", crew='" + crew + '\'' +
+                ", hyperdriveRating='" + hyperdriveRating + '\'' +
+                ", costInCredits='" + costInCredits + '\'' +
+                ", name='" + name + '\'' +
+                ", model='" + model + '\'' +
+                '}';
+    }
+
     //endregion
 }

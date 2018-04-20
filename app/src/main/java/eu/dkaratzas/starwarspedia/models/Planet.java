@@ -10,7 +10,7 @@ import java.util.List;
 
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
-public class Planet extends SwapiModel implements Parcelable {
+public class Planet extends SwapiModel {
     @JsonProperty("films")
     private List<String> films;
     @JsonProperty("edited")
@@ -41,6 +41,7 @@ public class Planet extends SwapiModel implements Parcelable {
     private String terrain;
 
     public Planet() {
+        super();
         this.films = new ArrayList<>();
         this.edited = "";
         this.created = "";
@@ -182,5 +183,26 @@ public class Planet extends SwapiModel implements Parcelable {
     public SwapiCategory getCategory() {
         return SwapiCategory.PLANET;
     }
+
+    @Override
+    public String toString() {
+        return "Planet{" +
+                "films=" + films +
+                ", edited='" + edited + '\'' +
+                ", created='" + created + '\'' +
+                ", climate='" + climate + '\'' +
+                ", rotationPeriod='" + rotationPeriod + '\'' +
+                ", url='" + url + '\'' +
+                ", population='" + population + '\'' +
+                ", orbitalPeriod='" + orbitalPeriod + '\'' +
+                ", surfaceWater='" + surfaceWater + '\'' +
+                ", diameter='" + diameter + '\'' +
+                ", gravity='" + gravity + '\'' +
+                ", name='" + name + '\'' +
+                ", residents=" + residents +
+                ", terrain='" + terrain + '\'' +
+                '}';
+    }
+
     //endregion
 }

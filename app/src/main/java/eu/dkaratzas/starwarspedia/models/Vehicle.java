@@ -15,7 +15,7 @@ import java.util.List;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
 
-public class Vehicle extends SwapiModel implements Parcelable {
+public class Vehicle extends SwapiModel {
     @JsonProperty("max_atmosphering_speed")
     private String maxAtmospheringSpeed;
     @JsonProperty("cargo_capacity")
@@ -50,6 +50,7 @@ public class Vehicle extends SwapiModel implements Parcelable {
     private String model;
 
     public Vehicle() {
+        super();
         this.maxAtmospheringSpeed = "";
         this.cargoCapacity = "";
         this.films = new ArrayList<>();
@@ -205,5 +206,28 @@ public class Vehicle extends SwapiModel implements Parcelable {
     public SwapiCategory getCategory() {
         return SwapiCategory.VEHICLE;
     }
+
+    @Override
+    public String toString() {
+        return "Vehicle{" +
+                "maxAtmospheringSpeed='" + maxAtmospheringSpeed + '\'' +
+                ", cargoCapacity='" + cargoCapacity + '\'' +
+                ", films=" + films +
+                ", passengers='" + passengers + '\'' +
+                ", pilots=" + pilots +
+                ", edited='" + edited + '\'' +
+                ", consumables='" + consumables + '\'' +
+                ", created='" + created + '\'' +
+                ", length='" + length + '\'' +
+                ", url='" + url + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", crew='" + crew + '\'' +
+                ", vehicleClass='" + vehicleClass + '\'' +
+                ", costInCredits='" + costInCredits + '\'' +
+                ", name='" + name + '\'' +
+                ", model='" + model + '\'' +
+                '}';
+    }
+
     //endregion
 }

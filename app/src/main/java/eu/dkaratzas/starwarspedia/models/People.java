@@ -1,50 +1,43 @@
 package eu.dkaratzas.starwarspedia.models;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import eu.dkaratzas.starwarspedia.api.StarWarsApi;
+import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
-public class People extends SwapiModel implements Parcelable {
-    @JsonProperty("films")
+public class People extends SwapiModel {
     private List<String> films;
-    @JsonProperty("homeworld")
     private String homeworld;
-    @JsonProperty("gender")
     private String gender;
-    @JsonProperty("skin_color")
     private String skinColor;
-    @JsonProperty("edited")
     private String edited;
-    @JsonProperty("created")
     private String created;
-    @JsonProperty("mass")
     private String mass;
-    @JsonProperty("vehicles")
     private List<String> vehicles;
-    @JsonProperty("url")
     private String url;
-    @JsonProperty("hair_color")
     private String hairColor;
-    @JsonProperty("birth_year")
     private String birthYear;
-    @JsonProperty("eye_color")
     private String eyeColor;
-    @JsonProperty("species")
     private List<String> species;
-    @JsonProperty("starships")
     private List<String> starships;
-    @JsonProperty("name")
     private String name;
-    @JsonProperty("height")
     private String height;
 
     public People() {
+        super();
         this.films = new ArrayList<>();
         this.homeworld = "";
         this.gender = "";
@@ -61,6 +54,41 @@ public class People extends SwapiModel implements Parcelable {
         this.starships = new ArrayList<>();
         this.name = "";
         this.height = "";
+    }
+
+    @JsonCreator
+    public People(@JsonProperty("films") List<String> films,
+                  @JsonProperty("homeworld") String homeworld,
+                  @JsonProperty("gender") String gender,
+                  @JsonProperty("skin_color") String skinColor,
+                  @JsonProperty("edited") String edited,
+                  @JsonProperty("created") String created,
+                  @JsonProperty("mass") String mass,
+                  @JsonProperty("vehicles") List<String> vehicles,
+                  @JsonProperty("url") String url,
+                  @JsonProperty("hair_color") String hairColor,
+                  @JsonProperty("birth_year") String birthYear,
+                  @JsonProperty("eye_color") String eyeColor,
+                  @JsonProperty("species") List<String> species,
+                  @JsonProperty("starships") List<String> starships,
+                  @JsonProperty("name") String name,
+                  @JsonProperty("height") String height) {
+        this.films = films;
+        this.homeworld = homeworld;
+        this.gender = gender;
+        this.skinColor = skinColor;
+        this.edited = edited;
+        this.created = created;
+        this.mass = mass;
+        this.vehicles = vehicles;
+        this.url = url;
+        this.hairColor = hairColor;
+        this.birthYear = birthYear;
+        this.eyeColor = eyeColor;
+        this.species = species;
+        this.starships = starships;
+        this.name = name;
+        this.height = height;
     }
 
     //region Parcelable
@@ -188,6 +216,51 @@ public class People extends SwapiModel implements Parcelable {
     }
 
     @Override
+    public int getId() {
+        return getIdFromUrl(url);
+    }
+
+    @Override
+    public String getTitle() {
+        return name;
+    }
+
+    @Override
+    public SwapiCategory getCategory() {
+        return SwapiCategory.PEOPLE;
+    }
+
+    @Override
+    public void getDetailsToDisplay(@NonNull final StarWarsApiCallback<Map<String, Object>> callback, Context context) {
+        if (callback == null)
+            throw new IllegalArgumentException("Callback can't be null!");
+
+        final Map<String, Object> result = new HashMap<>();
+        result.put("Birth Year", birthYear);
+        result.put("Height", height);
+        result.put("Mass", mass);
+        result.put("Gender", gender);
+        result.put("Hair Color", hairColor);
+        result.put("Skin Color", skinColor);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... unused) {
+                if (species != null && species.size() > 0) {
+                    SwapiModel swapiModel = (SwapiModel) StarWarsApi.getApi().getItemRequestOnCategoryById(getIdFromUrl(species.get(0)), SwapiCategory.SPECIES).sync();
+                    result.put("Species", swapiModel);
+                }
+                if (homeworld != null && !homeworld.equals("")) {
+                    SwapiModel swapiModel = (SwapiModel) StarWarsApi.getApi().getItemRequestOnCategoryById(getIdFromUrl(homeworld), SwapiCategory.PLANET).sync();
+                    result.put("Homeworld", swapiModel);
+                }
+                callback.onResponse(result);
+                return null;
+            }
+        }.execute();
+    }
+
+    @Override
     public String toString() {
         return "People{" +
                 "films=" + films +
@@ -208,21 +281,5 @@ public class People extends SwapiModel implements Parcelable {
                 ", height='" + height + '\'' +
                 '}';
     }
-
-    @Override
-    public int getId() {
-        return getIdFromUrl(url);
-    }
-
-    @Override
-    public String getTitle() {
-        return name;
-    }
-
-    @Override
-    public SwapiCategory getCategory() {
-        return SwapiCategory.PEOPLE;
-    }
-
     //endregion
 }

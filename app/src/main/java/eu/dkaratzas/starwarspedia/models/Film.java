@@ -10,7 +10,7 @@ import java.util.List;
 
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
-public class Film extends SwapiModel implements Parcelable {
+public class Film extends SwapiModel {
     @JsonProperty("edited")
     private String edited;
     @JsonProperty("director")
@@ -41,6 +41,7 @@ public class Film extends SwapiModel implements Parcelable {
     private String producer;
 
     public Film() {
+        super();
         this.edited = "";
         this.director = "";
         this.created = "";
@@ -126,6 +127,26 @@ public class Film extends SwapiModel implements Parcelable {
     @Override
     public SwapiCategory getCategory() {
         return SwapiCategory.FILM;
+    }
+
+    @Override
+    public String toString() {
+        return "Film{" +
+                "edited='" + edited + '\'' +
+                ", director='" + director + '\'' +
+                ", created='" + created + '\'' +
+                ", vehicles=" + vehicles +
+                ", openingCrawl='" + openingCrawl + '\'' +
+                ", title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                ", characters=" + characters +
+                ", episodeId=" + episodeId +
+                ", planets=" + planets +
+                ", releaseDate='" + releaseDate + '\'' +
+                ", starships=" + starships +
+                ", species=" + species +
+                ", producer='" + producer + '\'' +
+                '}';
     }
 
     //endregion

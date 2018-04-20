@@ -10,7 +10,7 @@ import java.util.List;
 
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
-public class Species extends SwapiModel implements Parcelable {
+public class Species extends SwapiModel {
     @JsonProperty("films")
     private List<String> films;
     @JsonProperty("skin_colors")
@@ -43,6 +43,7 @@ public class Species extends SwapiModel implements Parcelable {
     private String averageLifespan;
 
     public Species() {
+        super();
         this.films = new ArrayList<>();
         this.skinColors = "";
         this.homeworld = "";
@@ -191,5 +192,27 @@ public class Species extends SwapiModel implements Parcelable {
     public SwapiCategory getCategory() {
         return SwapiCategory.SPECIES;
     }
+
+    @Override
+    public String toString() {
+        return "Species{" +
+                "films=" + films +
+                ", skinColors='" + skinColors + '\'' +
+                ", homeworld='" + homeworld + '\'' +
+                ", edited='" + edited + '\'' +
+                ", created='" + created + '\'' +
+                ", eyeColors='" + eyeColors + '\'' +
+                ", language='" + language + '\'' +
+                ", classification='" + classification + '\'' +
+                ", people=" + people +
+                ", url='" + url + '\'' +
+                ", hairColors='" + hairColors + '\'' +
+                ", averageHeight='" + averageHeight + '\'' +
+                ", name='" + name + '\'' +
+                ", designation='" + designation + '\'' +
+                ", averageLifespan='" + averageLifespan + '\'' +
+                '}';
+    }
+
     //endregion
 }
