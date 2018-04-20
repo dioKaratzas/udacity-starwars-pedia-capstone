@@ -26,14 +26,14 @@ public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiMode
         mSwapiCategory = swapiCategory;
     }
 
-    public static <T> Loader load(Context context, LoaderManager manager,
-                                  int id, SwapiCategory swapiCategory, StarWarsApiCallback<SwapiModelList<SwapiModel>> apiCallback) {
+    public static Loader load(Context context, LoaderManager manager,
+                              int id, SwapiCategory swapiCategory, StarWarsApiCallback<SwapiModelList<SwapiModel>> apiCallback) {
         return manager.initLoader(id, null, new CategoryDataLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
     }
 
 
-    public static <T> Loader reload(Context context, LoaderManager manager,
-                                    int id, SwapiCategory swapiCategory, StarWarsApiCallback<SwapiModelList<SwapiModel>> apiCallback) {
+    public static Loader reload(Context context, LoaderManager manager,
+                                int id, SwapiCategory swapiCategory, StarWarsApiCallback<SwapiModelList<SwapiModel>> apiCallback) {
         return manager.restartLoader(id, null, new CategoryDataLoader.LoaderCallbacksDelegator(context, swapiCategory, apiCallback));
     }
 
@@ -119,9 +119,10 @@ public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiMode
             this.mCallback = callback;
         }
 
+
         @NonNull
         @Override
-        public Loader onCreateLoader(int id, @Nullable Bundle args) {
+        public Loader<SwapiModelList<SwapiModel>> onCreateLoader(int id, @Nullable Bundle args) {
             return new CategoryDataLoader(mContext, mSwapiCategory);
         }
 
@@ -131,8 +132,9 @@ public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiMode
         }
 
         @Override
-        public void onLoaderReset(@NonNull Loader loader) {
+        public void onLoaderReset(@NonNull Loader<SwapiModelList<SwapiModel>> loader) {
 
         }
+
     }
 }
