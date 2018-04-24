@@ -108,7 +108,7 @@ public class CategoryFragment extends Fragment {
                 position = savedInstanceState.getInt(BUNDLE_RECYCLER_POSITION);
             }
 
-            mTvTitle.setText(mCategory.toString(getContext()));
+            mTvTitle.setText(mCategory.getString(getContext()));
             setUpRecycler(position);
         } else {
             setLoadingStatus(false);
@@ -175,13 +175,13 @@ public class CategoryFragment extends Fragment {
         if (Misc.isNetworkAvailable(getActivity().getApplicationContext())) {
             setLoadingStatus(true);
 
-            CategoryDataLoader.reload(getContext(), getActivity().getSupportLoaderManager(), LOADER_ID, mCategory, new StarWarsApiCallback<SwapiModelList<SwapiModel>>() {
+            CategoryDataLoader.load(getContext(), getActivity().getSupportLoaderManager(), LOADER_ID, mCategory, new StarWarsApiCallback<SwapiModelList<SwapiModel>>() {
                 @Override
                 public void onResponse(SwapiModelList<SwapiModel> result) {
                     if (result == null) {
                         StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
                     } else {
-                        mTvTitle.setText(mCategory.toString(getContext()));
+                        mTvTitle.setText(mCategory.getString(getContext()));
                     }
 
                     mData = result;

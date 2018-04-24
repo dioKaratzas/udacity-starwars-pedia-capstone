@@ -1,14 +1,22 @@
 package eu.dkaratzas.starwarspedia.models;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import eu.dkaratzas.starwarspedia.R;
+import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+import eu.dkaratzas.starwarspedia.loaders.RelatedItemsLoader;
 
 public class Planet extends SwapiModel {
     @JsonProperty("films")
@@ -113,61 +121,6 @@ public class Planet extends SwapiModel {
     //endregion
 
     //region Getters
-    public List<String> getFilms() {
-        return films;
-    }
-
-    public String getEdited() {
-        return edited;
-    }
-
-    public String getCreated() {
-        return created;
-    }
-
-    public String getClimate() {
-        return climate;
-    }
-
-    public String getRotationPeriod() {
-        return rotationPeriod;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getPopulation() {
-        return population;
-    }
-
-    public String getOrbitalPeriod() {
-        return orbitalPeriod;
-    }
-
-    public String getSurfaceWater() {
-        return surfaceWater;
-    }
-
-    public String getDiameter() {
-        return diameter;
-    }
-
-    public String getGravity() {
-        return gravity;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getResidents() {
-        return residents;
-    }
-
-    public String getTerrain() {
-        return terrain;
-    }
 
     @Override
     public int getId() {
@@ -182,6 +135,38 @@ public class Planet extends SwapiModel {
     @Override
     public SwapiCategory getCategory() {
         return SwapiCategory.PLANET;
+    }
+
+    @Override
+    public Map<String, String> getDetailsToDisplay(Context context) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put(context.getString(R.string.population), population);
+        result.put(context.getString(R.string.rotation_period), rotationPeriod);
+        result.put(context.getString(R.string.orbital_period), orbitalPeriod);
+        result.put(context.getString(R.string.diameter), diameter);
+        result.put(context.getString(R.string.gravity), gravity);
+        result.put(context.getString(R.string.terrain), terrain);
+        result.put(context.getString(R.string.surface_water), surfaceWater);
+        result.put(context.getString(R.string.climate), climate);
+
+        return result;
+    }
+
+    @Override
+    public void getRelatedToItemsAsyncLoader(Context context, LoaderManager manager, int loaderId, @NonNull StarWarsApiCallback<Map<String, List<SwapiModel>>> callback) {
+        if (callback == null)
+            throw new IllegalArgumentException("Callback can't be null!");
+
+        // Title, [SwapiCategory, List[Urls]]
+        Map<String, Map<SwapiCategory, List<String>>> itemsToLoad = new LinkedHashMap<>();
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.FILM, films);
+        }});
+        itemsToLoad.put(context.getString(R.string.residents), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.PLANET, residents);
+        }});
+
+        RelatedItemsLoader.load(context, manager, loaderId, itemsToLoad, callback);
     }
 
     @Override

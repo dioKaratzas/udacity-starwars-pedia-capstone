@@ -1,10 +1,13 @@
 package eu.dkaratzas.starwarspedia.api;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
 
 import eu.dkaratzas.starwarspedia.Constants;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
@@ -50,13 +53,79 @@ public class StarWarsApi implements Serializable {
         return sharedInstance;
     }
 
-    @SuppressWarnings("unchecked")
-    public Request<SwapiModel> getCategoryItemById(int id, SwapiCategory swapiCategory) {
-        return getItemRequestOnCategoryById(id, SwapiCategory.PEOPLE);
+    public SwapiModelList<SwapiModel> getAllItemsOnCategory(SwapiCategory swapiCategory) {
+        int currentPage = 1;
+        boolean gotAnotherPage;
+        SwapiModelList<SwapiModel> result = null;
+        do {
+            try {
+                result = appendResult(result, getItemsRequestOnCategoryById(currentPage, swapiCategory).sync());
+                currentPage++;
+                gotAnotherPage = result.gotAnotherPage();
+            } catch (Exception ex) {
+                Timber.e(Log.getStackTraceString(ex));
+                return null;
+            }
+
+
+        } while (gotAnotherPage);
+
+        return result;
     }
 
+    public SwapiModel getItemOnCategoryByUrl(String itemUrl, SwapiCategory swapiCategory) {
+        try {
+            int itemId = SwapiModel.getIdFromUrl(itemUrl);
+            if (itemId != 0) {
+                return (SwapiModel) getItemRequestOnCategoryById(itemId, swapiCategory).sync();
+            }
+        } catch (Exception ex) {
+            Timber.e(Log.getStackTraceString(ex));
+            return null;
+        }
+        return null;
+    }
+
+    public List<SwapiModel> getItemsOnCategoryByUrls(List<String> itemUrls, SwapiCategory swapiCategory) {
+        if (itemUrls != null && itemUrls.size() > 0) {
+            try {
+                List<SwapiModel> resultList = new ArrayList<>();
+
+                for (String item : itemUrls) {
+
+                    int itemId = SwapiModel.getIdFromUrl(item);
+                    if (itemId != 0) {
+                        SwapiModel result = (SwapiModel) getItemRequestOnCategoryById(itemId, swapiCategory).sync();
+                        if (result != null)
+                            resultList.add(result);
+                    }
+                }
+
+                return resultList;
+            } catch (Exception ex) {
+                Timber.e(Log.getStackTraceString(ex));
+                return null;
+            }
+
+        }
+        return null;
+    }
+
+    private SwapiModelList<SwapiModel> appendResult(SwapiModelList<SwapiModel> result, SwapiModelList<SwapiModel> newResult) {
+        if (result == null) {
+            result = newResult;
+        } else {
+            result.results.addAll(newResult.results);
+
+            result = new SwapiModelList<>(newResult.getNext(), newResult.getPrevious(), newResult.getCount(), result.results);
+
+        }
+        return result;
+    }
+
+
     @SuppressWarnings("unchecked")
-    public Request getItemRequestOnCategoryById(int id, SwapiCategory swapiCategory) {
+    private Request getItemRequestOnCategoryById(int id, SwapiCategory swapiCategory) {
 
         switch (swapiCategory) {
             case FILM:
@@ -77,7 +146,7 @@ public class StarWarsApi implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public Request<SwapiModelList<SwapiModel>> getItemsRequestOnCategoryById(int page, SwapiCategory swapiCategory) {
+    private Request<SwapiModelList<SwapiModel>> getItemsRequestOnCategoryById(int page, SwapiCategory swapiCategory) {
         if (page < 1) {
             throw new InvalidParameterException("Page must be a number starting from 1");
         }
@@ -99,7 +168,7 @@ public class StarWarsApi implements Serializable {
         return null;
     }
 
-    public final class Request<T> {
+    private final class Request<T> {
         private Call<T> delegate;
 
         public Request(Call<T> delegate) {

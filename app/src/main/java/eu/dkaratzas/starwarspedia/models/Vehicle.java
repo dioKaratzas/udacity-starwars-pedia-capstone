@@ -4,15 +4,23 @@ package eu.dkaratzas.starwarspedia.models;
  * Created by JacksonGenerator on 4/12/18.
  */
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import eu.dkaratzas.starwarspedia.R;
+import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+import eu.dkaratzas.starwarspedia.loaders.RelatedItemsLoader;
 
 
 public class Vehicle extends SwapiModel {
@@ -128,69 +136,6 @@ public class Vehicle extends SwapiModel {
     //endregion
 
     //region Getters
-    public String getMaxAtmospheringSpeed() {
-        return maxAtmospheringSpeed;
-    }
-
-    public String getCargoCapacity() {
-        return cargoCapacity;
-    }
-
-    public List<String> getFilms() {
-        return films;
-    }
-
-    public String getPassengers() {
-        return passengers;
-    }
-
-    public List<String> getPilots() {
-        return pilots;
-    }
-
-    public String getEdited() {
-        return edited;
-    }
-
-    public String getConsumables() {
-        return consumables;
-    }
-
-    public String getCreated() {
-        return created;
-    }
-
-    public String getLength() {
-        return length;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public String getCrew() {
-        return crew;
-    }
-
-    public String getVehicleClass() {
-        return vehicleClass;
-    }
-
-    public String getCostInCredits() {
-        return costInCredits;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getModel() {
-        return model;
-    }
 
     @Override
     public int getId() {
@@ -205,6 +150,40 @@ public class Vehicle extends SwapiModel {
     @Override
     public SwapiCategory getCategory() {
         return SwapiCategory.VEHICLE;
+    }
+
+    @Override
+    public Map<String, String> getDetailsToDisplay(Context context) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put(context.getString(R.string.model), model);
+        result.put(context.getString(R.string.manufacturer), manufacturer);
+        result.put(context.getString(R.string.starship_class), vehicleClass);
+        result.put(context.getString(R.string.cost), costInCredits);
+        result.put(context.getString(R.string.speed), maxAtmospheringSpeed);
+        result.put(context.getString(R.string.length), length);
+        result.put(context.getString(R.string.cargo_capacity), cargoCapacity);
+        result.put(context.getString(R.string.crew), crew);
+        result.put(context.getString(R.string.passengers), passengers);
+
+        return result;
+    }
+
+
+    @Override
+    public void getRelatedToItemsAsyncLoader(Context context, LoaderManager manager, int loaderId, @NonNull StarWarsApiCallback<Map<String, List<SwapiModel>>> callback) {
+        if (callback == null)
+            throw new IllegalArgumentException("Callback can't be null!");
+
+        Map<String, Map<SwapiCategory, List<String>>> itemsToLoad = new LinkedHashMap<>();
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.FILM, films);
+        }});
+
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.pilots)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.PEOPLE, pilots);
+        }});
+
+        RelatedItemsLoader.load(context, manager, loaderId, itemsToLoad, callback);
     }
 
     @Override

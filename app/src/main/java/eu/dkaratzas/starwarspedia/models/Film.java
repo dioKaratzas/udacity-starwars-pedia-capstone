@@ -1,14 +1,22 @@
 package eu.dkaratzas.starwarspedia.models;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import eu.dkaratzas.starwarspedia.R;
+import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+import eu.dkaratzas.starwarspedia.loaders.RelatedItemsLoader;
 
 public class Film extends SwapiModel {
     @JsonProperty("edited")
@@ -127,6 +135,42 @@ public class Film extends SwapiModel {
     @Override
     public SwapiCategory getCategory() {
         return SwapiCategory.FILM;
+    }
+
+    @Override
+    public Map<String, String> getDetailsToDisplay(Context context) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put(context.getString(R.string.release_date), releaseDate);
+        result.put(context.getString(R.string.director), director);
+        result.put(context.getString(R.string.producer), producer);
+        result.put(context.getString(R.string.opening_crawl), openingCrawl);
+
+        return result;
+    }
+
+    @Override
+    public void getRelatedToItemsAsyncLoader(Context context, LoaderManager manager, int loaderId, @NonNull StarWarsApiCallback<Map<String, List<SwapiModel>>> callback) {
+        if (callback == null)
+            throw new IllegalArgumentException("Callback can't be null!");
+
+        Map<String, Map<SwapiCategory, List<String>>> itemsToLoad = new LinkedHashMap<>();
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.people)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.PEOPLE, characters);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.planets)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.PLANET, planets);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.species)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.SPECIES, species);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.starships)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.STARSHIP, starships);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.vehicles)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.VEHICLE, vehicles);
+        }});
+
+        RelatedItemsLoader.load(context, manager, loaderId, itemsToLoad, callback);
     }
 
     @Override

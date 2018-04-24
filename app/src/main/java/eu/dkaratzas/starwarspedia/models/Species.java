@@ -1,14 +1,22 @@
 package eu.dkaratzas.starwarspedia.models;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import eu.dkaratzas.starwarspedia.R;
+import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+import eu.dkaratzas.starwarspedia.loaders.RelatedItemsLoader;
 
 public class Species extends SwapiModel {
     @JsonProperty("films")
@@ -118,66 +126,6 @@ public class Species extends SwapiModel {
     //endregion
 
     //region Getters
-    public List<String> getFilms() {
-        return films;
-    }
-
-    public String getSkinColors() {
-        return skinColors;
-    }
-
-    public String getHomeworld() {
-        return homeworld;
-    }
-
-    public String getEdited() {
-        return edited;
-    }
-
-    public String getCreated() {
-        return created;
-    }
-
-    public String getEyeColors() {
-        return eyeColors;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public String getClassification() {
-        return classification;
-    }
-
-    public List<String> getPeople() {
-        return people;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getHairColors() {
-        return hairColors;
-    }
-
-    public String getAverageHeight() {
-        return averageHeight;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDesignation() {
-        return designation;
-    }
-
-    public String getAverageLifespan() {
-        return averageLifespan;
-    }
-
     @Override
     public int getId() {
         return getIdFromUrl(url);
@@ -185,13 +133,46 @@ public class Species extends SwapiModel {
 
     @Override
     public String getTitle() {
-        return getName();
+        return name;
     }
 
     @Override
     public SwapiCategory getCategory() {
         return SwapiCategory.SPECIES;
     }
+
+    @Override
+    public Map<String, String> getDetailsToDisplay(Context context) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put(context.getString(R.string.classification), classification);
+        result.put(context.getString(R.string.designation), designation);
+        result.put(context.getString(R.string.language), language);
+        result.put(context.getString(R.string.avg_lifespan), averageLifespan);
+        result.put(context.getString(R.string.avg_height), averageHeight);
+        result.put(context.getString(R.string.hair_color), hairColors);
+        result.put(context.getString(R.string.skin_color), skinColors);
+        result.put(context.getString(R.string.eye_color), eyeColors);
+
+        return result;
+    }
+
+    @Override
+    public void getRelatedToItemsAsyncLoader(Context context, LoaderManager manager, int loaderId, @NonNull StarWarsApiCallback<Map<String, List<SwapiModel>>> callback) {
+        if (callback == null)
+            throw new IllegalArgumentException("Callback can't be null!");
+
+        Map<String, Map<SwapiCategory, List<String>>> itemsToLoad = new LinkedHashMap<>();
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.FILM, films);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.people)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.PEOPLE, people);
+        }});
+
+
+        RelatedItemsLoader.load(context, manager, loaderId, itemsToLoad, callback);
+    }
+
 
     @Override
     public String toString() {

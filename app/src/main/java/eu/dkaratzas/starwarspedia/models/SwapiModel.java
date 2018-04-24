@@ -3,6 +3,7 @@ package eu.dkaratzas.starwarspedia.models;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -17,8 +18,6 @@ import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import timber.log.Timber;
 
 public abstract class SwapiModel implements Parcelable {
-    protected Map<String, Object> detailsMapList;
-    protected Map<SwapiCategory, List<SwapiModel>> relatedMapList;
 
     public abstract int getId();
 
@@ -26,8 +25,13 @@ public abstract class SwapiModel implements Parcelable {
 
     public abstract SwapiCategory getCategory();
 
-    public void getDetailsToDisplay(@NonNull final StarWarsApiCallback<Map<String, Object>> callback, Context context) {
-    }
+    /**
+     * Its responsible to call RelatedItemsLoader and provide the required List of items to load
+     * The loader returns a Map with key the Title to display and values a List[SwapiModel]
+     */
+    public abstract void getRelatedToItemsAsyncLoader(Context context, LoaderManager manager, int loaderId, @NonNull StarWarsApiCallback<Map<String, List<SwapiModel>>> callback);
+
+    public abstract Map<String, String> getDetailsToDisplay(final Context context);
 
     public StorageReference getImageStorageReference() {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -48,19 +52,20 @@ public abstract class SwapiModel implements Parcelable {
         return null;
     }
 
-    int getIdFromUrl(String url) {
-        final String regex = "https.*/([0-9]+)/(?:&.)*";
-        final Pattern pattern = Pattern.compile(regex);
-        final Matcher matcher = pattern.matcher(url);
+    public static int getIdFromUrl(String url) {
+        if (url != null && !url.equals("")) {
+            final String regex = "https.*/([0-9]+)/(?:&.)*";
+            final Pattern pattern = Pattern.compile(regex);
+            final Matcher matcher = pattern.matcher(url);
 
 
-        if (matcher.matches()) {
-            int result = Integer.parseInt(matcher.group(1));
+            if (matcher.matches()) {
+                int result = Integer.parseInt(matcher.group(1));
 
-            Timber.v("Category: %s, Title: %s, Id: %d", getCategory().toString(), getTitle(), result);
-            return result;
+                Timber.v("Url: %s, Id: %d", url, result);
+                return result;
+            }
         }
-
         return 0;
     }
 
@@ -69,11 +74,4 @@ public abstract class SwapiModel implements Parcelable {
         return "SwapiModel{}";
     }
 
-    public Map<String, Object> getDetailsMapList() {
-        return detailsMapList;
-    }
-
-    public Map<SwapiCategory, List<SwapiModel>> getRelatedMapList() {
-        return relatedMapList;
-    }
 }

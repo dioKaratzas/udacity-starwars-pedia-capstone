@@ -1,39 +1,56 @@
 package eu.dkaratzas.starwarspedia.models;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import eu.dkaratzas.starwarspedia.api.StarWarsApi;
+import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
+import eu.dkaratzas.starwarspedia.loaders.RelatedItemsLoader;
 
 public class People extends SwapiModel {
+    @JsonProperty("films")
     private List<String> films;
+    @JsonProperty("homeworld")
     private String homeworld;
+    @JsonProperty("gender")
     private String gender;
+    @JsonProperty("skin_color")
     private String skinColor;
+    @JsonProperty("edited")
     private String edited;
+    @JsonProperty("created")
     private String created;
+    @JsonProperty("mass")
     private String mass;
+    @JsonProperty("vehicles")
     private List<String> vehicles;
+    @JsonProperty("url")
     private String url;
+    @JsonProperty("hair_color")
     private String hairColor;
+    @JsonProperty("birth_year")
     private String birthYear;
+    @JsonProperty("eye_color")
     private String eyeColor;
+    @JsonProperty("species")
     private List<String> species;
+    @JsonProperty("starships")
     private List<String> starships;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("height")
     private String height;
 
     public People() {
@@ -54,41 +71,6 @@ public class People extends SwapiModel {
         this.starships = new ArrayList<>();
         this.name = "";
         this.height = "";
-    }
-
-    @JsonCreator
-    public People(@JsonProperty("films") List<String> films,
-                  @JsonProperty("homeworld") String homeworld,
-                  @JsonProperty("gender") String gender,
-                  @JsonProperty("skin_color") String skinColor,
-                  @JsonProperty("edited") String edited,
-                  @JsonProperty("created") String created,
-                  @JsonProperty("mass") String mass,
-                  @JsonProperty("vehicles") List<String> vehicles,
-                  @JsonProperty("url") String url,
-                  @JsonProperty("hair_color") String hairColor,
-                  @JsonProperty("birth_year") String birthYear,
-                  @JsonProperty("eye_color") String eyeColor,
-                  @JsonProperty("species") List<String> species,
-                  @JsonProperty("starships") List<String> starships,
-                  @JsonProperty("name") String name,
-                  @JsonProperty("height") String height) {
-        this.films = films;
-        this.homeworld = homeworld;
-        this.gender = gender;
-        this.skinColor = skinColor;
-        this.edited = edited;
-        this.created = created;
-        this.mass = mass;
-        this.vehicles = vehicles;
-        this.url = url;
-        this.hairColor = hairColor;
-        this.birthYear = birthYear;
-        this.eyeColor = eyeColor;
-        this.species = species;
-        this.starships = starships;
-        this.name = name;
-        this.height = height;
     }
 
     //region Parcelable
@@ -151,70 +133,6 @@ public class People extends SwapiModel {
     //endregion
 
     //region Getters
-    public List<String> getFilms() {
-        return films;
-    }
-
-    public String getHomeworld() {
-        return homeworld;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public String getSkinColor() {
-        return skinColor;
-    }
-
-    public String getEdited() {
-        return edited;
-    }
-
-    public String getCreated() {
-        return created;
-    }
-
-    public String getMass() {
-        return mass;
-    }
-
-    public List<String> getVehicles() {
-        return vehicles;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getHairColor() {
-        return hairColor;
-    }
-
-    public String getBirthYear() {
-        return birthYear;
-    }
-
-    public String getEyeColor() {
-        return eyeColor;
-    }
-
-    public List<String> getSpecies() {
-        return species;
-    }
-
-    public List<String> getStarships() {
-        return starships;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getHeight() {
-        return height;
-    }
-
     @Override
     public int getId() {
         return getIdFromUrl(url);
@@ -231,34 +149,44 @@ public class People extends SwapiModel {
     }
 
     @Override
-    public void getDetailsToDisplay(@NonNull final StarWarsApiCallback<Map<String, Object>> callback, Context context) {
+    public Map<String, String> getDetailsToDisplay(final Context context) {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put(context.getString(R.string.birth_year), birthYear);
+        result.put(context.getString(R.string.height), height);
+        result.put(context.getString(R.string.mass), mass);
+        result.put(context.getString(R.string.gender), gender);
+        result.put(context.getString(R.string.hair_color), hairColor);
+        result.put(context.getString(R.string.skin_color), skinColor);
+
+        return result;
+    }
+
+
+    @Override
+    public void getRelatedToItemsAsyncLoader(Context context, LoaderManager manager, int loaderId, @NonNull StarWarsApiCallback<Map<String, List<SwapiModel>>> callback) {
         if (callback == null)
             throw new IllegalArgumentException("Callback can't be null!");
 
-        final Map<String, Object> result = new HashMap<>();
-        result.put("Birth Year", birthYear);
-        result.put("Height", height);
-        result.put("Mass", mass);
-        result.put("Gender", gender);
-        result.put("Hair Color", hairColor);
-        result.put("Skin Color", skinColor);
+        Map<String, Map<SwapiCategory, List<String>>> itemsToLoad = new LinkedHashMap<>();
+        itemsToLoad.put(context.getString(R.string.homeworld), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.PLANET, Arrays.asList(homeworld));
+        }});
+        itemsToLoad.put(context.getString(R.string.species), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.SPECIES, species);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.FILM, films);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.starships)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.STARSHIP, starships);
+        }});
+        itemsToLoad.put(String.format(context.getString(R.string.related), context.getString(R.string.vehicles)), new LinkedHashMap<SwapiCategory, List<String>>() {{
+            put(SwapiCategory.VEHICLE, vehicles);
+        }});
 
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... unused) {
-                if (species != null && species.size() > 0) {
-                    SwapiModel swapiModel = (SwapiModel) StarWarsApi.getApi().getItemRequestOnCategoryById(getIdFromUrl(species.get(0)), SwapiCategory.SPECIES).sync();
-                    result.put("Species", swapiModel);
-                }
-                if (homeworld != null && !homeworld.equals("")) {
-                    SwapiModel swapiModel = (SwapiModel) StarWarsApi.getApi().getItemRequestOnCategoryById(getIdFromUrl(homeworld), SwapiCategory.PLANET).sync();
-                    result.put("Homeworld", swapiModel);
-                }
-                callback.onResponse(result);
-                return null;
-            }
-        }.execute();
+        RelatedItemsLoader.load(context, manager, loaderId, itemsToLoad, callback);
     }
+
 
     @Override
     public String toString() {

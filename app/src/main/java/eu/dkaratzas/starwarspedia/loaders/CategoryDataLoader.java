@@ -8,14 +8,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 
 import eu.dkaratzas.starwarspedia.api.StarWarsApi;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
 import eu.dkaratzas.starwarspedia.models.SwapiModelList;
-import timber.log.Timber;
 
 public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiModel>> {
     private SwapiCategory mSwapiCategory;
@@ -40,23 +38,7 @@ public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiMode
     @Nullable
     @Override
     public SwapiModelList<SwapiModel> loadInBackground() {
-        int currentPage = 1;
-        boolean gotAnotherPage;
-        SwapiModelList<SwapiModel> result = null;
-        do {
-            try {
-                result = mapResult(result, StarWarsApi.getApi().getItemsRequestOnCategoryById(currentPage, mSwapiCategory).sync());
-                currentPage++;
-                gotAnotherPage = result.gotAnotherPage();
-            } catch (Exception ex) {
-                Timber.e(Log.getStackTraceString(ex));
-                return null;
-            }
-
-
-        } while (gotAnotherPage);
-
-        return result;
+        return StarWarsApi.getApi().getAllItemsOnCategory(mSwapiCategory);
     }
 
     @Override
@@ -94,18 +76,6 @@ public class CategoryDataLoader extends AsyncTaskLoader<SwapiModelList<SwapiMode
         }
     }
 
-
-    private SwapiModelList<SwapiModel> mapResult(SwapiModelList<SwapiModel> result, SwapiModelList<SwapiModel> newResult) {
-        if (result == null) {
-            result = newResult;
-        } else {
-            result.results.addAll(newResult.results);
-
-            result = new SwapiModelList<>(newResult.getNext(), newResult.getPrevious(), newResult.getCount(), result.results);
-
-        }
-        return result;
-    }
 
     static class LoaderCallbacksDelegator implements LoaderManager.LoaderCallbacks<SwapiModelList<SwapiModel>> {
 
