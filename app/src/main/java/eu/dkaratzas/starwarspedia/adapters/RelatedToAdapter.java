@@ -10,39 +10,40 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.util.List;
+
 import eu.dkaratzas.starwarspedia.R;
-import eu.dkaratzas.starwarspedia.holders.CategoryViewHolder;
+import eu.dkaratzas.starwarspedia.holders.RelatedToViewHolder;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
 import eu.dkaratzas.starwarspedia.models.SwapiModel;
-import eu.dkaratzas.starwarspedia.models.SwapiModelList;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
+public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> {
     private Context mContext;
-    private SwapiModelList<SwapiModel> mSwapiModelList;
+    private List<SwapiModel> mSwapiList;
     private OnItemClickListener mClickListener;
 
-    public CategoryAdapter(Context context, SwapiModelList<SwapiModel> swapiModelList, OnItemClickListener itemClickListener) {
+    public RelatedToAdapter(Context context, List<SwapiModel> List, OnItemClickListener itemClickListener) {
         mContext = context;
-        mSwapiModelList = swapiModelList;
+        mSwapiList = List;
         mClickListener = itemClickListener;
     }
 
     @NonNull
     @Override
-    public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category, parent, false);
-        return new CategoryViewHolder(view);
+    public RelatedToViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_related_to, parent, false);
+        return new RelatedToViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-        final SwapiModel swapiModel = mSwapiModelList.results.get(position);
+    public void onBindViewHolder(@NonNull RelatedToViewHolder holder, @SuppressLint("RecyclerView") final int position) {
+        final SwapiModel swapiModel = mSwapiList.get(position);
         holder.mTitle.setText(swapiModel.getTitle());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mClickListener != null) {
-                    mClickListener.onItemClick(mSwapiModelList.results.get(position));
+                    mClickListener.onItemClick(mSwapiList.get(position));
                 }
             }
         });
@@ -54,7 +55,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mSwapiModelList.results.size();
+        return mSwapiList.size();
     }
 
     public interface OnItemClickListener {

@@ -2,7 +2,6 @@ package eu.dkaratzas.starwarspedia.controllers.fragments;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -26,6 +25,7 @@ import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.libs.GridAutofitLayoutManager;
 import eu.dkaratzas.starwarspedia.libs.Misc;
+import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.libs.animations.YoYo;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.FadeInAnimator;
@@ -245,7 +245,7 @@ public class CategoryFragment extends Fragment {
                 }
             });
             GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getContext(), getContext().getResources().getDimensionPixelSize(R.dimen.thumb_image_height));
-            ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset));
+            SpacingItemDecoration itemDecoration = new SpacingItemDecoration(getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset));
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.addItemDecoration(itemDecoration);
@@ -274,22 +274,6 @@ public class CategoryFragment extends Fragment {
         void onCategoryItemClicked(SwapiModel swapiModel);
 
         void onCategoryDataLoading(boolean loading);
-    }
-
-    private class ItemOffsetDecoration extends RecyclerView.ItemDecoration {
-
-        private int mItemOffset;
-
-        public ItemOffsetDecoration(int itemOffset) {
-            mItemOffset = itemOffset;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
-                                   RecyclerView.State state) {
-            super.getItemOffsets(outRect, view, parent, state);
-            outRect.set(mItemOffset, mItemOffset, mItemOffset, mItemOffset);
-        }
     }
 
 }
