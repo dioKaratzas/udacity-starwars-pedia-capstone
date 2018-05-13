@@ -64,4 +64,5 @@
     <string name="crew">Minimum Crew</string>
     <string name="passengers">Passengers</string>
     <string name="pilots">Pilots</string>
+    <string name="consumables">Consumables</string>
 </resources>

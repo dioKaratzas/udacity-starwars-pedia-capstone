@@ -3,6 +3,7 @@ package eu.dkaratzas.starwarspedia.controllers.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -54,6 +55,8 @@ public class DetailActivity extends AppCompatActivity {
     TextView mTvDetails;
     @BindView(R.id.linearContainer)
     LinearLayout mLinearContainer;
+    @BindView(R.id.scrollView)
+    NestedScrollView mScrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +147,12 @@ public class DetailActivity extends AppCompatActivity {
 
             addCategoryToLinearContainer(entry.getKey(), recyclerView);
         }
+        mScrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mScrollView.scrollTo(0, 0);
+            }
+        }, 500);
     }
 
     private void addCategoryToLinearContainer(String title, View view) {

@@ -279,9 +279,86 @@ public class AllQueryData implements Parcelable {
     }
 
     private void mapStarshipsData(Context context, StarshipQuery.Data data) {
+        StarshipQuery.Starship starship = data.Starship();
+
+        if (starship != null) {
+            this.id = getSafeString(starship.id());
+            this.title = getSafeString(starship.name());
+            this.category = SwapiCategory.STARSHIP;
+            this.detailsMap = new LinkedHashMap<>();
+            this.relatedItems = new LinkedHashMap<>();
+
+            detailsMap.put(context.getString(R.string.manufacturer), getSafeString(starship.manufacturer()));
+            detailsMap.put(context.getString(R.string.starship_class), getSafeString(starship.class_()));
+            detailsMap.put(context.getString(R.string.cost), getSafeString(starship.costInCredits()));
+            detailsMap.put(context.getString(R.string.speed), getSafeString(starship.maxAtmospheringSpeed()));
+            detailsMap.put(context.getString(R.string.hyperdrive_rating), getSafeString(starship.hyperdriveRating()));
+            detailsMap.put(context.getString(R.string.mglt), getSafeString(starship.mglt()));
+            detailsMap.put(context.getString(R.string.length), getSafeString(starship.length()));
+            detailsMap.put(context.getString(R.string.cargo_capacity), getSafeString(starship.cargoCapacity()));
+            detailsMap.put(context.getString(R.string.crew), getSafeString(starship.crew()));
+            detailsMap.put(context.getString(R.string.passengers), getSafeString(starship.passengers()));
+            detailsMap.put(context.getString(R.string.consumables), getSafeString(starship.consumables()));
+
+            if (starship.pilots() != null && starship.pilots().size() > 0) {
+                List<QueryData> items = new ArrayList<>();
+                for (StarshipQuery.Pilot pilot : starship.pilots()) {
+                    items.add(new QueryData(pilot.id(), pilot.name(), SwapiCategory.PEOPLE));
+                }
+
+                relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.pilots)), items);
+            }
+
+            if (starship.films() != null && starship.films().size() > 0) {
+                List<QueryData> items = new ArrayList<>();
+                for (StarshipQuery.Film film : starship.films()) {
+                    items.add(new QueryData(film.id(), film.title(), SwapiCategory.FILM));
+                }
+
+                relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), items);
+            }
+        }
     }
 
     private void mapVehiclesData(Context context, VehicleQuery.Data data) {
+        VehicleQuery.Vehicle vehicle = data.Vehicle();
+
+        if (vehicle != null) {
+            this.id = getSafeString(vehicle.id());
+            this.title = getSafeString(vehicle.name());
+            this.category = SwapiCategory.STARSHIP;
+            this.detailsMap = new LinkedHashMap<>();
+            this.relatedItems = new LinkedHashMap<>();
+
+            detailsMap.put(context.getString(R.string.manufacturer), getSafeString(vehicle.manufacturer()));
+            detailsMap.put(context.getString(R.string.model), getSafeString(vehicle.model()));
+            detailsMap.put(context.getString(R.string.starship_class), getSafeString(vehicle.class_()));
+            detailsMap.put(context.getString(R.string.cost), getSafeString(vehicle.costInCredits()));
+            detailsMap.put(context.getString(R.string.speed), getSafeString(vehicle.maxAtmospheringSpeed()));
+            detailsMap.put(context.getString(R.string.length), getSafeString(vehicle.length()));
+            detailsMap.put(context.getString(R.string.cargo_capacity), getSafeString(vehicle.cargoCapacity()));
+            detailsMap.put(context.getString(R.string.crew), getSafeString(vehicle.crew()));
+            detailsMap.put(context.getString(R.string.passengers), getSafeString(vehicle.passengers()));
+            detailsMap.put(context.getString(R.string.consumables), getSafeString(vehicle.consumables()));
+
+            if (vehicle.pilots() != null && vehicle.pilots().size() > 0) {
+                List<QueryData> items = new ArrayList<>();
+                for (VehicleQuery.Pilot pilot : vehicle.pilots()) {
+                    items.add(new QueryData(pilot.id(), pilot.name(), SwapiCategory.PEOPLE));
+                }
+
+                relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.pilots)), items);
+            }
+
+            if (vehicle.films() != null && vehicle.films().size() > 0) {
+                List<QueryData> items = new ArrayList<>();
+                for (VehicleQuery.Film film : vehicle.films()) {
+                    items.add(new QueryData(film.id(), film.title(), SwapiCategory.FILM));
+                }
+
+                relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), items);
+            }
+        }
     }
 
     private String getSafeString(Object value) {
