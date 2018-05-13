@@ -1,4 +1,4 @@
-package eu.dkaratzas.starwarspedia.loaders.RetrofitLoader;
+package eu.dkaratzas.starwarspedia.api;
 
 
 import android.content.Context;
@@ -6,48 +6,56 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.apollographql.apollo.ApolloCall;
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.exception.ApolloException;
+
+import javax.annotation.Nonnull;
+
 
 /**
- * Loader implementation for Retrofit 2.0 Call API.
+ * Loader implementation for Apollo Call API.
  *
  * @param <T> The data type to be loaded.
  */
-public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
+
+class ApolloLoader<T> extends Loader<ResultHolder<T>> {
+
     /**
-     * Load the provided {@link Call} using the {@link LoaderManager},
+     * Load the provided {@link ApolloCall} using the {@link LoaderManager},
      * or deliver the result if it has already been loaded at the
      * provided ID.
      *
      * @param <T>      The data type to be loaded.
-     * @param context  The Context to provide to the RetrofitLoader.
+     * @param context  The Context to provide to the ApolloLoader.
      * @param manager  The LoaderManager instance.
-     * @param id       The unique identifier to be used for the RetrofitLoader.
+     * @param id       The unique identifier to be used for the ApolloLoader.
      * @param call     The call to be executed.
-     * @param callback The Retrofit callback.
+     * @param callback The Apollo callback.
      */
+
     public static <T> void load(Context context, LoaderManager manager,
-                                int id, Call<T> call, Callback<T> callback) {
+                                int id, ApolloCall<T> call, ApolloCall.Callback<T> callback) {
         manager.initLoader(id, null, new LoaderCallbacksDelegator<>(
                 context, call, callback));
     }
 
+
     /**
-     * Reload the provided {@link Call} using the {@link LoaderManager},
+     * Reload the provided {@link ApolloCall} using the {@link LoaderManager},
      * regardless of whether a result has already been loaded or is
      * currently loading.
      *
      * @param <T>      The data type to be loaded.
-     * @param context  The Context to provide to the RetrofitLoader.
+     * @param context  The Context to provide to the ApolloLoader.
      * @param manager  The LoaderManager instance.
-     * @param id       The unique identifier to be used for the RetrofitLoader.
+     * @param id       The unique identifier to be used for the ApolloLoader.
      * @param call     The call to be executed.
-     * @param callback The Retrofit callback.
+     * @param callback The Apollo callback.
      */
+
     public static <T> void reload(Context context, LoaderManager manager,
-                                  int id, Call<T> call, Callback<T> callback) {
+                                  int id, ApolloCall<T> call, ApolloCall.Callback<T> callback) {
         manager.restartLoader(id, null, new LoaderCallbacksDelegator<>(
                 context, call, callback));
     }
@@ -55,11 +63,11 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
     static class LoaderCallbacksDelegator<T>
             implements LoaderManager.LoaderCallbacks<ResultHolder<T>> {
         private final Context context;
-        private final Call<T> call;
-        private final Callback<T> callback;
+        private final ApolloCall<T> call;
+        private final ApolloCall.Callback<T> callback;
 
         LoaderCallbacksDelegator(Context context,
-                                 Call<T> call, Callback<T> callback) {
+                                 ApolloCall<T> call, ApolloCall.Callback<T> callback) {
             this.context = context;
             this.call = call;
             this.callback = callback;
@@ -68,7 +76,7 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
         @Override
         public Loader<ResultHolder<T>> onCreateLoader(
                 int id, Bundle args) {
-            return new RetrofitLoader<>(context, call);
+            return new ApolloLoader<>(context, call);
         }
 
         @Override
@@ -77,11 +85,11 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
             Response<T> response;
             try {
                 response = resultHolder.get();
-            } catch (Throwable t) {
-                callback.onFailure(call, t);
+            } catch (ApolloException t) {
+                callback.onFailure(t);
                 return;
             }
-            callback.onResponse(call, response);
+            callback.onResponse(response);
         }
 
         @Override
@@ -89,11 +97,11 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
         }
     }
 
-    private final Call<T> call;
-    private Call<T> currentCall, cancellingCall;
+    private final ApolloCall<T> call;
+    private ApolloCall<T> currentCall, cancellingCall;
     private ResultHolder<T> result;
 
-    public RetrofitLoader(Context context, Call<T> call) {
+    public ApolloLoader(Context context, ApolloCall<T> call) {
         super(context);
         this.call = call;
     }
@@ -160,11 +168,21 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
         return true;
     }
 
-    private class ResultHandler implements Callback<T> {
-        private final Call<T> call;
+    private class ResultHandler extends ApolloCall.Callback<T> {
+        private final ApolloCall<T> call;
 
         ResultHandler() {
             call = currentCall;
+        }
+
+        @Override
+        public void onResponse(@Nonnull Response<T> response) {
+            onResult(new ResultHolder.ResponseHolder<>(response));
+        }
+
+        @Override
+        public void onFailure(@Nonnull ApolloException e) {
+            onResult(new ResultHolder.ErrorHolder<T>(e));
         }
 
         private void onResult(ResultHolder<T> result) {
@@ -181,15 +199,6 @@ public class RetrofitLoader<T> extends Loader<ResultHolder<T>> {
                 deliverResult(result);
             }
         }
-
-        @Override
-        public void onResponse(Call<T> call, Response<T> response) {
-            onResult(new ResultHolder.ResponseHolder<>(response));
-        }
-
-        @Override
-        public void onFailure(Call<T> call, Throwable t) {
-            onResult(new ResultHolder.ErrorHolder<T>(t));
-        }
     }
 }
+

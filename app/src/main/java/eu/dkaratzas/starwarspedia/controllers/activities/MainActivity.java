@@ -19,13 +19,19 @@ import butterknife.ButterKnife;
 import eu.dkaratzas.starsgl.widget.StarView;
 import eu.dkaratzas.starwarspedia.GlobalApplication;
 import eu.dkaratzas.starwarspedia.R;
+import eu.dkaratzas.starwarspedia.api.ApolloManager;
+import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.controllers.fragments.CategoryFragment;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
-import eu.dkaratzas.starwarspedia.models.SwapiModel;
+import eu.dkaratzas.starwarspedia.libs.StatusMessage;
+import eu.dkaratzas.starwarspedia.models.AllQueryData;
+import eu.dkaratzas.starwarspedia.models.QueryData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CategoryFragment.CategoryFragmentCallbacks {
+
+    private static final int LOADER_ID = 90;
 
     @BindView(R.id.starView)
     StarView mStarView;
@@ -122,13 +128,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     @Override
-    public void onCategoryItemClicked(SwapiModel swapiModel) {
-        if (swapiModel != null) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, swapiModel);
-            Intent intent = new Intent(this, DetailActivity.class);
-            intent.putExtras(bundle);
-            startActivity(intent);
+    public void onCategoryItemClicked(QueryData queryData) {
+        getSupportLoaderManager().destroyLoader(LOADER_ID);
+        if (queryData != null) {
+            ApolloManager.instance().fetchSwapiItem(this, queryData.getId(), queryData.getCategory(), getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<AllQueryData>() {
+                @Override
+                public void onResponse(AllQueryData result) {
+                    getSupportLoaderManager().destroyLoader(LOADER_ID);
+                    if (result == null) {
+                        StatusMessage.show(MainActivity.this, getString(R.string.error_getting_data));
+                    } else {
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, result);
+                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }
+                }
+            });
+
         }
     }
 

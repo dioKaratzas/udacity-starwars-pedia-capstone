@@ -18,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,18 +26,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.adapters.RelatedToAdapter;
+import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
-import eu.dkaratzas.starwarspedia.models.SwapiModel;
+import eu.dkaratzas.starwarspedia.libs.StatusMessage;
+import eu.dkaratzas.starwarspedia.models.AllQueryData;
+import eu.dkaratzas.starwarspedia.models.QueryData;
 import timber.log.Timber;
 
 public class DetailActivity extends AppCompatActivity {
-    private static final int LOADER_ID = 90;
 
-    private SwapiModel mSwapiModel;
+    private AllQueryData mData;
     public static final String EXTRA_DATA_TO_DISPLAY = "extra_data";
+    public static final int LOADER_ID = 91;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -57,7 +61,7 @@ public class DetailActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey(EXTRA_DATA_TO_DISPLAY)) {
-            mSwapiModel = bundle.getParcelable(EXTRA_DATA_TO_DISPLAY);
+            mData = bundle.getParcelable(EXTRA_DATA_TO_DISPLAY);
 
             setSupportActionBar(mToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -70,19 +74,19 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void publishUI() {
-        getSupportActionBar().setTitle(mSwapiModel.getCategory().getString(getApplicationContext()));
-        mTvTitle.setText(mSwapiModel.getTitle());
+        getSupportActionBar().setTitle(mData.getCategory().getString(getApplicationContext()));
+        mTvTitle.setText(mData.getTitle());
 
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(6));
         GlideApp.with(this)
-                .load(mSwapiModel.getImageStorageReference())
+                .load(mData.getImageStorageReference())
                 .apply(requestOptions)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(mIvThumb);
 
-        Map<String, String> detailsMap = mSwapiModel.getDetailsToDisplay(getApplicationContext());
+        LinkedHashMap<String, String> detailsMap = mData.getDetailsMap();
         StringBuilder details = new StringBuilder();
         for (Map.Entry<String, String> entry : detailsMap.entrySet()) {
             details.append(String.format("<b>%s:</b> %s<br>", entry.getKey(), entry.getValue()));
@@ -94,63 +98,59 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadAndPublishRelatedToRecyclers() {
-        mSwapiModel.getRelatedToItemsAsyncLoader(this, getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<Map<String, List<SwapiModel>>>() {
-            @Override
-            public void onResponse(Map<String, List<SwapiModel>> result) {
+        for (Map.Entry<String, List<QueryData>> entry : mData.getRelatedItems().entrySet()) {
+            Timber.d("Publishing recycler for %s entry", entry.getKey());
 
-                for (Map.Entry<String, List<SwapiModel>> entry : result.entrySet()) {
-                    Timber.d("Publishing recycler for %s entry", entry.getKey());
+            TextView title = new TextView(DetailActivity.this);
+            title.setText(entry.getKey());
+            // TODO: Add text size on dimens and margin
+            title.setTextSize(22);
+            int viewsMargin = getApplicationContext().getResources().getDimensionPixelSize(R.dimen.margin_large);
+            title.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                    TextView title = new TextView(DetailActivity.this);
-                    title.setText(entry.getKey());
-                    // TODO: Add text size on dimens and margin
-                    title.setTextSize(22);
-                    int viewsMargin = getApplicationContext().getResources().getDimensionPixelSize(R.dimen.margin_large);
-                    title.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(0, Misc.dpToPx(24), 0, 0); // first item need extra top margin
+            title.setLayoutParams(lp);
 
-                    lp.setMargins(0, Misc.dpToPx(24), 0, 0); // first item need extra top margin
-                    title.setLayoutParams(lp);
-
-                    RecyclerView recyclerView = new RecyclerView(DetailActivity.this);
-                    RelatedToAdapter relatedToAdapter = new RelatedToAdapter(getApplicationContext(), entry.getValue(), new RelatedToAdapter.OnItemClickListener() {
+            RecyclerView recyclerView = new RecyclerView(DetailActivity.this);
+            RelatedToAdapter relatedToAdapter = new RelatedToAdapter(getApplicationContext(), entry.getValue(), new RelatedToAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(QueryData queryData) {
+                    ApolloManager.instance().fetchSwapiItem(getApplicationContext(), queryData.getId(), queryData.getCategory(), getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<AllQueryData>() {
                         @Override
-                        public void onItemClick(SwapiModel swapiModel) {
-                            if (swapiModel != null) {
+                        public void onResponse(AllQueryData result) {
+                            getSupportLoaderManager().destroyLoader(LOADER_ID);
+                            if (result == null) {
+                                StatusMessage.show(DetailActivity.this, getString(R.string.error_getting_data));
+                            } else {
                                 Bundle bundle = new Bundle();
-                                bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, swapiModel);
+                                bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, result);
                                 Intent intent = new Intent(DetailActivity.this, DetailActivity.class);
                                 intent.putExtras(bundle);
-
                                 startActivity(intent);
                                 finish();
                             }
                         }
                     });
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
-                    SpacingItemDecoration itemDecoration = new SpacingItemDecoration(viewsMargin);
-                    recyclerView.setHasFixedSize(true);
-                    recyclerView.setLayoutManager(layoutManager);
-                    recyclerView.addItemDecoration(itemDecoration);
-                    recyclerView.setAdapter(relatedToAdapter);
-
-                    mBottomContainer.addView(title);
-                    mBottomContainer.addView(recyclerView);
                 }
-            }
+            });
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+            SpacingItemDecoration itemDecoration = new SpacingItemDecoration(viewsMargin);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.addItemDecoration(itemDecoration);
+            recyclerView.setAdapter(relatedToAdapter);
 
-            @Override
-            public void onCancel() {
-
-            }
-        });
+            mBottomContainer.addView(title);
+            mBottomContainer.addView(recyclerView);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            getSupportLoaderManager().destroyLoader(LOADER_ID);
+//            getSupportLoaderManager().destroyLoader(LOADER_ID);
             finish();
             return true;
         }
@@ -159,7 +159,7 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        getSupportLoaderManager().destroyLoader(LOADER_ID);
+//        getSupportLoaderManager().destroyLoader(LOADER_ID);
         super.onBackPressed();
     }
 }

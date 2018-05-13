@@ -1,0 +1,206 @@
+query allFilms {
+  allFilms {
+    id
+    title
+  }
+}
+
+query film($id: ID) {
+  Film(id: $id) {
+    id
+    title
+    director
+    openingCrawl
+    planets {
+      id
+      name
+    }
+    producers
+    releaseDate
+    characters {
+      id
+      name
+    }
+    species {
+      id
+      name
+    }
+    starships {
+      id
+      name
+    }
+    vehicles {
+      id
+      name
+    }
+  }
+}
+
+query allPersons {
+  allPersons {
+    id
+    name
+  }
+}
+
+query person($id: ID) {
+  Person(id: $id) {
+    id
+    name
+    birthYear
+    eyeColor
+    films {
+      id
+      title
+    }
+    gender
+    hairColor
+    height
+    homeworld {
+      id
+      name
+    }
+    mass
+    skinColor
+    species {
+      id
+      name
+    }
+    starships {
+      id
+      name
+    }
+    vehicles {
+      id
+      name
+    }
+  }
+}
+
+query allPlanets {
+  allPlanets {
+    id
+    name
+  }
+}
+
+query planet($id: ID) {
+  Planet(id: $id) {
+    id
+    name
+    climate
+    diameter
+    films {
+      id
+      title
+    }
+    gravity
+    orbitalPeriod
+    population
+    residents {
+      id
+      name
+    }
+    rotationPeriod
+    surfaceWater
+    terrain
+  }
+}
+
+
+query allSpecies {
+  allSpecies {
+    id
+    name
+  }
+}
+
+query species($id: ID) {
+  Species(id: $id) {
+    id
+    name
+    averageHeight
+    averageLifespan
+    classification
+    designation
+    eyeColor
+    hairColor
+    films {
+      id
+      title
+    }
+    language
+    people {
+      id
+      name
+    }
+    skinColor
+  }
+}
+
+query allStarships {
+  allStarships {
+    id
+    name
+  }
+}
+
+query starship($id: ID) {
+  Starship(id: $id) {
+    id
+    name
+    cargoCapacity
+    class
+    consumables
+    costInCredits
+    crew
+    films {
+      id
+      title
+    }
+    hyperdriveRating
+    length
+    manufacturer
+    maxAtmospheringSpeed
+    mglt
+    name
+    passengers
+    pilots {
+      id
+      name
+    }
+  }
+}
+
+query allVehicles {
+  allVehicles {
+    id
+    name
+  }
+}
+
+query vehicle($id: ID) {
+  Vehicle(id: $id) {
+    id
+    name
+    cargoCapacity
+    class
+    consumables
+    costInCredits
+    crew
+    films {
+      id
+      title
+    }
+    length
+    manufacturer
+    maxAtmospheringSpeed
+    model
+    name
+    passengers
+    pilots {
+      id
+      name
+    }
+  }
+}

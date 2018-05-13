@@ -15,16 +15,16 @@ import java.util.List;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.holders.RelatedToViewHolder;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
-import eu.dkaratzas.starwarspedia.models.SwapiModel;
+import eu.dkaratzas.starwarspedia.models.QueryData;
 
 public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> {
     private Context mContext;
-    private List<SwapiModel> mSwapiList;
+    private List<QueryData> mDataList;
     private OnItemClickListener mClickListener;
 
-    public RelatedToAdapter(Context context, List<SwapiModel> List, OnItemClickListener itemClickListener) {
+    public RelatedToAdapter(Context context, List<QueryData> dataList, OnItemClickListener itemClickListener) {
         mContext = context;
-        mSwapiList = List;
+        mDataList = dataList;
         mClickListener = itemClickListener;
     }
 
@@ -37,28 +37,28 @@ public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull RelatedToViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-        final SwapiModel swapiModel = mSwapiList.get(position);
-        holder.mTitle.setText(swapiModel.getTitle());
+        final QueryData queryData = mDataList.get(position);
+        holder.mTitle.setText(queryData.getTitle());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mClickListener != null) {
-                    mClickListener.onItemClick(mSwapiList.get(position));
+                    mClickListener.onItemClick(mDataList.get(position));
                 }
             }
         });
         GlideApp.with(mContext)
-                .load(swapiModel.getImageStorageReference())
+                .load(queryData.getImageStorageReference())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.mIvThumb);
     }
 
     @Override
     public int getItemCount() {
-        return mSwapiList.size();
+        return mDataList.size();
     }
 
     public interface OnItemClickListener {
-        void onItemClick(SwapiModel swapiModel);
+        void onItemClick(QueryData queryData);
     }
 }

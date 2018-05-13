@@ -13,17 +13,17 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.holders.CategoryViewHolder;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
-import eu.dkaratzas.starwarspedia.models.SwapiModel;
-import eu.dkaratzas.starwarspedia.models.SwapiModelList;
+import eu.dkaratzas.starwarspedia.models.CategoryItems;
+import eu.dkaratzas.starwarspedia.models.QueryData;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
     private Context mContext;
-    private SwapiModelList<SwapiModel> mSwapiModelList;
+    private CategoryItems mCategoryItems;
     private OnItemClickListener mClickListener;
 
-    public CategoryAdapter(Context context, SwapiModelList<SwapiModel> swapiModelList, OnItemClickListener itemClickListener) {
+    public CategoryAdapter(Context context, CategoryItems categoryItems, OnItemClickListener itemClickListener) {
         mContext = context;
-        mSwapiModelList = swapiModelList;
+        mCategoryItems = categoryItems;
         mClickListener = itemClickListener;
     }
 
@@ -36,28 +36,28 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-        final SwapiModel swapiModel = mSwapiModelList.results.get(position);
-        holder.mTitle.setText(swapiModel.getTitle());
+        final QueryData queryData = mCategoryItems.getQueryDataList().get(position);
+        holder.mTitle.setText(queryData.getTitle());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mClickListener != null) {
-                    mClickListener.onItemClick(mSwapiModelList.results.get(position));
+                    mClickListener.onItemClick(mCategoryItems.getQueryDataList().get(position));
                 }
             }
         });
         GlideApp.with(mContext)
-                .load(swapiModel.getImageStorageReference())
+                .load(queryData.getImageStorageReference())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.mIvThumb);
     }
 
     @Override
     public int getItemCount() {
-        return mSwapiModelList.results.size();
+        return mCategoryItems.getQueryDataList().size();
     }
 
     public interface OnItemClickListener {
-        void onItemClick(SwapiModel swapiModel);
+        void onItemClick(QueryData queryData);
     }
 }

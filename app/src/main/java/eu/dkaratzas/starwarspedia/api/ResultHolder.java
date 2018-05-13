@@ -1,22 +1,24 @@
-package eu.dkaratzas.starwarspedia.loaders.RetrofitLoader;
+package eu.dkaratzas.starwarspedia.api;
 
-import retrofit2.Response;
+
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.exception.ApolloException;
 
 /**
- * A wrapper around the Retrofit {@link Response} that will
+ * A wrapper around the Apollo {@link Response} that will
  * throw any loading errors upon retrieval.
  *
  * @param <T> The data type that was loaded.
  */
-public interface ResultHolder<T> {
+interface ResultHolder<T> {
     /**
      * Get the wrapped Response.
      *
      * @return The wrapped Response.
-     * @throws Throwable if Retrofit encountered an error
-     *                   while performing the HTTP request.
+     * @throws ApolloException if Apollo encountered an error
+     *                         while performing the HTTP request.
      */
-    Response<T> get() throws Throwable;
+    Response<T> get() throws ApolloException;
 
     class ResponseHolder<T> implements ResultHolder<T> {
         private final Response<T> response;
@@ -50,14 +52,14 @@ public interface ResultHolder<T> {
     }
 
     class ErrorHolder<T> implements ResultHolder<T> {
-        private final Throwable error;
+        private final ApolloException error;
 
-        ErrorHolder(Throwable throwable) {
+        ErrorHolder(ApolloException throwable) {
             this.error = throwable;
         }
 
         @Override
-        public Response<T> get() throws Throwable {
+        public Response<T> get() throws ApolloException {
             throw error;
         }
 
