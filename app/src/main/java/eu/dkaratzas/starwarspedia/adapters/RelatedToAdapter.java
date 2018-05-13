@@ -49,7 +49,9 @@ public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> 
         });
         GlideApp.with(mContext)
                 .load(queryData.getImageStorageReference())
+                .placeholder(R.drawable.ic_image_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
                 .into(holder.mIvThumb);
     }
 

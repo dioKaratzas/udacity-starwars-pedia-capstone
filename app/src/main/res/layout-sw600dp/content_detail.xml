@@ -19,7 +19,7 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/bottomContainer"
+                android:id="@+id/linearContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -35,12 +35,11 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:adjustViewBounds="true"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
                         app:layout_constraintDimensionRatio="2:3"
                         app:layout_constraintEnd_toStartOf="@+id/guideline3"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_launcher_foreground" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <android.support.constraint.Guideline
                         android:id="@+id/guideline3"

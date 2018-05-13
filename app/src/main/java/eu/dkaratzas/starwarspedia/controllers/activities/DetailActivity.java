@@ -8,7 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.TypedValue;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,8 +52,8 @@ public class DetailActivity extends AppCompatActivity {
     TextView mTvTitle;
     @BindView(R.id.tvDetails)
     TextView mTvDetails;
-    @BindView(R.id.bottomContainer)
-    LinearLayout mBottomContainer;
+    @BindView(R.id.linearContainer)
+    LinearLayout mLinearContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,14 +84,23 @@ public class DetailActivity extends AppCompatActivity {
         requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(6));
         GlideApp.with(this)
                 .load(mData.getImageStorageReference())
+                .placeholder(R.drawable.ic_image_placeholder)
                 .apply(requestOptions)
+                .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(mIvThumb);
 
         LinkedHashMap<String, String> detailsMap = mData.getDetailsMap();
         StringBuilder details = new StringBuilder();
         for (Map.Entry<String, String> entry : detailsMap.entrySet()) {
-            details.append(String.format("<b>%s:</b> %s<br>", entry.getKey(), entry.getValue()));
+            if (entry.getKey().equals(getString(R.string.opening_crawl))) {
+                TextView textView = new TextView(this);
+                textView.setText(Html.fromHtml(entry.getValue()));
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getApplicationContext().getResources().getDimension(R.dimen.text_large));
+                textView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
+                addCategoryToLinearContainer(entry.getKey(), textView);
+            } else
+                details.append(String.format("<b>%s:</b> %s<br>", entry.getKey(), entry.getValue()));
         }
         mTvDetails.setText(Html.fromHtml(details.toString()));
 
@@ -100,17 +111,6 @@ public class DetailActivity extends AppCompatActivity {
     private void loadAndPublishRelatedToRecyclers() {
         for (Map.Entry<String, List<QueryData>> entry : mData.getRelatedItems().entrySet()) {
             Timber.d("Publishing recycler for %s entry", entry.getKey());
-
-            TextView title = new TextView(DetailActivity.this);
-            title.setText(entry.getKey());
-            // TODO: Add text size on dimens and margin
-            title.setTextSize(22);
-            int viewsMargin = getApplicationContext().getResources().getDimensionPixelSize(R.dimen.margin_large);
-            title.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-            lp.setMargins(0, Misc.dpToPx(24), 0, 0); // first item need extra top margin
-            title.setLayoutParams(lp);
 
             RecyclerView recyclerView = new RecyclerView(DetailActivity.this);
             RelatedToAdapter relatedToAdapter = new RelatedToAdapter(getApplicationContext(), entry.getValue(), new RelatedToAdapter.OnItemClickListener() {
@@ -134,6 +134,7 @@ public class DetailActivity extends AppCompatActivity {
                     });
                 }
             });
+            int viewsMargin = getApplicationContext().getResources().getDimensionPixelSize(R.dimen.margin_large);
             LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
             SpacingItemDecoration itemDecoration = new SpacingItemDecoration(viewsMargin);
             recyclerView.setHasFixedSize(true);
@@ -141,9 +142,23 @@ public class DetailActivity extends AppCompatActivity {
             recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setAdapter(relatedToAdapter);
 
-            mBottomContainer.addView(title);
-            mBottomContainer.addView(recyclerView);
+            addCategoryToLinearContainer(entry.getKey(), recyclerView);
         }
+    }
+
+    private void addCategoryToLinearContainer(String title, View view) {
+        TextView tvTitle = new TextView(DetailActivity.this);
+        tvTitle.setText(title);
+        tvTitle.setTextSize(22);
+        tvTitle.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, Misc.dpToPx(24), 0, 0); // first item need extra top margin
+
+        tvTitle.setLayoutParams(lp);
+
+        mLinearContainer.addView(tvTitle);
+        mLinearContainer.addView(view);
     }
 
     @Override
