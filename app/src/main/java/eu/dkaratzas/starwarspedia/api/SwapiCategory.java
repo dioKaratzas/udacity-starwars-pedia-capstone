@@ -18,7 +18,7 @@ public enum SwapiCategory {
         stringResourceId = s;
     }
 
-    public String toString(Context context) {
+    public String getString(Context context) {
         return context.getResources().getString(stringResourceId);
     }
 }

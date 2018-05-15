@@ -10,39 +10,40 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.util.List;
+
 import eu.dkaratzas.starwarspedia.R;
-import eu.dkaratzas.starwarspedia.holders.CategoryViewHolder;
+import eu.dkaratzas.starwarspedia.holders.RelatedToViewHolder;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
-import eu.dkaratzas.starwarspedia.models.CategoryItems;
 import eu.dkaratzas.starwarspedia.models.QueryData;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
+public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> {
     private Context mContext;
-    private CategoryItems mCategoryItems;
+    private List<QueryData> mDataList;
     private OnItemClickListener mClickListener;
 
-    public CategoryAdapter(Context context, CategoryItems categoryItems, OnItemClickListener itemClickListener) {
+    public RelatedToAdapter(Context context, List<QueryData> dataList, OnItemClickListener itemClickListener) {
         mContext = context;
-        mCategoryItems = categoryItems;
+        mDataList = dataList;
         mClickListener = itemClickListener;
     }
 
     @NonNull
     @Override
-    public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category, parent, false);
-        return new CategoryViewHolder(view);
+    public RelatedToViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_related_to, parent, false);
+        return new RelatedToViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-        final QueryData queryData = mCategoryItems.getQueryDataList().get(position);
+    public void onBindViewHolder(@NonNull RelatedToViewHolder holder, @SuppressLint("RecyclerView") final int position) {
+        final QueryData queryData = mDataList.get(position);
         holder.mTitle.setText(queryData.getTitle());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mClickListener != null) {
-                    mClickListener.onItemClick(mCategoryItems.getQueryDataList().get(position));
+                    mClickListener.onItemClick(mDataList.get(position));
                 }
             }
         });
@@ -56,7 +57,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mCategoryItems.getQueryDataList().size();
+        return mDataList.size();
     }
 
     public interface OnItemClickListener {

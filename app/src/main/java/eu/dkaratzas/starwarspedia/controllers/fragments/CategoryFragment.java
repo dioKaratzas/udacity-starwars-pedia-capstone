@@ -2,7 +2,6 @@ package eu.dkaratzas.starwarspedia.controllers.fragments;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -22,18 +21,19 @@ import butterknife.Unbinder;
 import eu.dkaratzas.starwarspedia.GlobalApplication;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.adapters.CategoryAdapter;
+import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.libs.GridAutofitLayoutManager;
 import eu.dkaratzas.starwarspedia.libs.Misc;
+import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.libs.animations.YoYo;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.FadeInAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.PulseAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
-import eu.dkaratzas.starwarspedia.loaders.CategoryDataLoader;
-import eu.dkaratzas.starwarspedia.models.SwapiModel;
-import eu.dkaratzas.starwarspedia.models.SwapiModelList;
+import eu.dkaratzas.starwarspedia.models.CategoryItems;
+import eu.dkaratzas.starwarspedia.models.QueryData;
 import timber.log.Timber;
 
 /**
@@ -62,7 +62,7 @@ public class CategoryFragment extends Fragment {
     private SwapiCategory mCategory;
     private CategoryFragmentCallbacks mListener;
     private Unbinder mUnbinder;
-    private SwapiModelList<SwapiModel> mData;
+    private CategoryItems mCategoryItems;
 
     public CategoryFragment() {
         // Required empty public constructor
@@ -101,14 +101,14 @@ public class CategoryFragment extends Fragment {
 
 
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_DATA_KEY)) {
-            mData = savedInstanceState.getParcelable(BUNDLE_DATA_KEY);
+            mCategoryItems = savedInstanceState.getParcelable(BUNDLE_DATA_KEY);
 
             int position = 0;
             if (savedInstanceState.containsKey(BUNDLE_RECYCLER_POSITION)) {
                 position = savedInstanceState.getInt(BUNDLE_RECYCLER_POSITION);
             }
 
-            mTvTitle.setText(mCategory.toString(getContext()));
+            mTvTitle.setText(mCategory.getString(getContext()));
             setUpRecycler(position);
         } else {
             setLoadingStatus(false);
@@ -130,8 +130,8 @@ public class CategoryFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mData != null) {
-            outState.putParcelable(BUNDLE_DATA_KEY, mData);
+        if (mCategoryItems != null) {
+            outState.putParcelable(BUNDLE_DATA_KEY, mCategoryItems);
 
             if (mRecyclerView.getLayoutManager() != null && mRecyclerView.getLayoutManager() instanceof GridAutofitLayoutManager)
                 outState.putInt(BUNDLE_RECYCLER_POSITION, ((GridAutofitLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition());
@@ -175,26 +175,21 @@ public class CategoryFragment extends Fragment {
         if (Misc.isNetworkAvailable(getActivity().getApplicationContext())) {
             setLoadingStatus(true);
 
-            CategoryDataLoader.reload(getContext(), getActivity().getSupportLoaderManager(), LOADER_ID, mCategory, new StarWarsApiCallback<SwapiModelList<SwapiModel>>() {
+            ApolloManager.instance().fetchSwapiCategory(getActivity(), mCategory, getActivity().getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<CategoryItems>() {
                 @Override
-                public void onResponse(SwapiModelList<SwapiModel> result) {
+                public void onResponse(CategoryItems result) {
                     if (result == null) {
                         StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
                     } else {
-                        mTvTitle.setText(mCategory.toString(getContext()));
+                        mTvTitle.setText(mCategory.getString(getContext()));
                     }
 
-                    mData = result;
+                    mCategoryItems = result;
                     getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
                     setUpRecycler(0);
                     setLoadingStatus(false);
                 }
 
-                @Override
-                public void onCancel() {
-                    mListener.onCategoryDataLoading(false);
-                    mAvi.smoothToHide();
-                }
             });
 
         } else {
@@ -218,7 +213,7 @@ public class CategoryFragment extends Fragment {
             mAvi.hide();
         }
 
-        if (mData == null && !loadingStatus)
+        if (mCategoryItems == null && !loadingStatus)
             // if data failed to load show the refresh button
             YoYo.with(new FadeInAnimator())
                     .duration(300)
@@ -237,15 +232,15 @@ public class CategoryFragment extends Fragment {
     }
 
     private void setUpRecycler(int position) {
-        if (mData != null) {
-            CategoryAdapter categoryAdapter = new CategoryAdapter(getContext(), mData, new CategoryAdapter.OnItemClickListener() {
+        if (mCategoryItems != null) {
+            CategoryAdapter categoryAdapter = new CategoryAdapter(getContext(), mCategoryItems, new CategoryAdapter.OnItemClickListener() {
                 @Override
-                public void onItemClick(SwapiModel swapiModel) {
-                    mListener.onCategoryItemClicked(swapiModel);
+                public void onItemClick(QueryData queryData) {
+                    mListener.onCategoryItemClicked(queryData);
                 }
             });
             GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getContext(), getContext().getResources().getDimensionPixelSize(R.dimen.thumb_image_height));
-            ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset));
+            SpacingItemDecoration itemDecoration = new SpacingItemDecoration(getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset));
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.addItemDecoration(itemDecoration);
@@ -271,25 +266,9 @@ public class CategoryFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface CategoryFragmentCallbacks {
-        void onCategoryItemClicked(SwapiModel swapiModel);
+        void onCategoryItemClicked(QueryData queryData);
 
         void onCategoryDataLoading(boolean loading);
-    }
-
-    private class ItemOffsetDecoration extends RecyclerView.ItemDecoration {
-
-        private int mItemOffset;
-
-        public ItemOffsetDecoration(int itemOffset) {
-            mItemOffset = itemOffset;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
-                                   RecyclerView.State state) {
-            super.getItemOffsets(outRect, view, parent, state);
-            outRect.set(mItemOffset, mItemOffset, mItemOffset, mItemOffset);
-        }
     }
 
 }
