@@ -1,6 +1,7 @@
 package eu.dkaratzas.starwarspedia.api;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v4.app.LoaderManager;
 
 import com.apollographql.apollo.ApolloCall;
@@ -11,12 +12,17 @@ import com.apollographql.apollo.response.CustomTypeAdapter;
 import com.apollographql.apollo.response.CustomTypeValue;
 
 import java.io.Serializable;
+import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 
 import api.AllFilmsQuery;
 import api.AllPersonsQuery;
@@ -32,9 +38,12 @@ import api.StarshipQuery;
 import api.VehicleQuery;
 import api.type.CustomType;
 import eu.dkaratzas.starwarspedia.Constants;
+import eu.dkaratzas.starwarspedia.libs.Tls12SocketFactory;
 import eu.dkaratzas.starwarspedia.models.AllQueryData;
 import eu.dkaratzas.starwarspedia.models.CategoryItems;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+import okhttp3.TlsVersion;
 import timber.log.Timber;
 
 /**
@@ -74,19 +83,10 @@ public class ApolloManager implements Serializable {
             }
         };
         apolloClient = ApolloClient.builder()
-                .
-
-                        serverUrl(Constants.BASE_URL)
-//                .httpCache(new ApolloHttpCache(cacheStore))
-                .
-
-                        addCustomTypeAdapter(CustomType.DATETIME, dateCustomTypeAdapter)
-                .
-
-                        okHttpClient(new OkHttpClient())
-                .
-
-                        build();
+                .serverUrl(Constants.BASE_URL)
+                .addCustomTypeAdapter(CustomType.DATETIME, dateCustomTypeAdapter)
+                .okHttpClient(enableTls12OnPreLollipop(new OkHttpClient.Builder()).build())
+                .build();
     }
 
     public static ApolloManager instance() {
@@ -176,6 +176,45 @@ public class ApolloManager implements Serializable {
         }
 
         return null;
+    }
+
+    private OkHttpClient.Builder enableTls12OnPreLollipop(OkHttpClient.Builder client) {
+        if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 22) {
+            try {
+                SSLContext sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(null, null, null);
+                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()),
+                        new X509TrustManager() {
+                            @Override
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @Override
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @Override
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                return new java.security.cert.X509Certificate[]{};
+                            }
+                        });
+
+                ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .tlsVersions(TlsVersion.TLS_1_2)
+                        .build();
+
+                List<ConnectionSpec> specs = new ArrayList<>();
+                specs.add(cs);
+                specs.add(ConnectionSpec.COMPATIBLE_TLS);
+                specs.add(ConnectionSpec.CLEARTEXT);
+
+                client.connectionSpecs(specs);
+            } catch (Exception exc) {
+                Timber.e(exc, "Error while setting TLS 1.2");
+            }
+        }
+
+        return client;
     }
 }
 
