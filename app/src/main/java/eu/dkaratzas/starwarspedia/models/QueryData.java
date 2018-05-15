@@ -32,20 +32,22 @@ public class QueryData implements Parcelable {
     }
 
     public StorageReference getImageStorageReference() {
+        String imageName = getTitle().replace('_', '/');
+
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         switch (category) {
             case FILM:
-                return storageRef.child("films/" + getId() + ".jpg");
+                return storageRef.child("films/" + imageName + ".jpg");
             case PEOPLE:
-                return storageRef.child("people/" + getId() + ".jpg");
+                return storageRef.child("people/" + imageName + ".jpg");
             case PLANET:
-                return storageRef.child("planets/" + getId() + ".jpg");
+                return storageRef.child("planets/" + imageName + ".jpg");
             case SPECIES:
-                return storageRef.child("species/" + getId() + ".jpg");
+                return storageRef.child("species/" + imageName + ".jpg");
             case STARSHIP:
-                return storageRef.child("starships/" + getId() + ".jpg");
+                return storageRef.child("starships/" + imageName + ".jpg");
             case VEHICLE:
-                return storageRef.child("vehicles/" + getId() + ".jpg");
+                return storageRef.child("vehicles/" + imageName + ".jpg");
         }
         return null;
     }
