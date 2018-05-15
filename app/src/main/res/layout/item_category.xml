@@ -20,12 +20,13 @@
                 android:id="@+id/ivThumb"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/thumb_image_height"
-                android:scaleType="centerCrop"
+                android:contentDescription="@string/image_thumbnail"
+                android:scaleType="fitCenter"
                 app:layout_constraintBottom_toTopOf="@+id/tvTitle"
                 app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="@string/image_thumbnail" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvTitle"
