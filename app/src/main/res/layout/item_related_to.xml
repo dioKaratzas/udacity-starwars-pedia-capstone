@@ -9,17 +9,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-
         <ImageView
             android:id="@+id/ivThumb"
-            android:layout_width="150dp"
-            android:layout_height="200dp"
+            android:layout_width="@dimen/related_to_item_image_width"
+            android:layout_height="@dimen/related_to_item_image_height"
+            android:contentDescription="@string/image_thumbnail"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout"
@@ -33,19 +32,19 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginBottom="@dimen/related_to_item_margin"
+                android:layout_marginEnd="@dimen/related_to_item_margin"
+                android:layout_marginStart="@dimen/related_to_item_margin"
+                android:layout_marginTop="@dimen/related_to_item_margin"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_large"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Video Title Video Title Video Title" />
+                tools:text="Title" />
         </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>

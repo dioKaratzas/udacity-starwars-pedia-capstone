@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -99,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
             if (entry.getKey().equals(getString(R.string.opening_crawl))) {
                 TextView textView = new TextView(this);
                 textView.setText(Html.fromHtml(entry.getValue()));
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getApplicationContext().getResources().getDimension(R.dimen.text_large));
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getApplicationContext().getResources().getDimension(R.dimen.text_x_large));
                 textView.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.white));
                 addCategoryToLinearContainer(entry.getKey(), textView);
             } else

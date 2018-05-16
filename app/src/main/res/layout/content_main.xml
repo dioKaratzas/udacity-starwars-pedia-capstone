@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:fitsSystemWindows="true"
-        app:layout_behavior="eu.dkaratzas.starwarspedia.libs.FixedAppBarLayoutBehavior">
+        app:layout_behavior="eu.dkaratzas.starwarspedia.libs.FixedAppBarLayoutBehavior"
+        tools:ignore="InconsistentLayout">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"

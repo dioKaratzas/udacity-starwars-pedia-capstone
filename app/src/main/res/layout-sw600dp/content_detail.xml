@@ -13,17 +13,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
-        android:maxWidth="700dp">
+        android:maxWidth="@dimen/details_container_max_width">
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginBottom="@dimen/details_card_container_margin"
+            android:layout_marginEnd="@dimen/details_card_container_margin"
+            android:layout_marginLeft="@dimen/details_card_container_margin"
+            android:layout_marginRight="@dimen/details_card_container_margin"
+            android:layout_marginStart="@dimen/details_card_container_margin"
+            android:layout_marginTop="@dimen/details_card_container_margin"
             app:cardBackgroundColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="@dimen/linear_container_padding">
 
                 <android.support.constraint.ConstraintLayout
                     android:id="@+id/topContainer"
@@ -47,13 +47,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
+                        android:contentDescription="@string/image_thumbnail"
                         android:scaleType="fitCenter"
-                        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+                        app:layout_constraintEnd_toStartOf="@+id/vGuideline30"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <android.support.constraint.Guideline
-                        android:id="@+id/guideline3"
+                        android:id="@+id/vGuideline30"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -63,10 +64,10 @@
                         android:id="@+id/tvTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="@dimen/title_text_left_margin"
+                        android:layout_marginStart="@dimen/title_text_left_margin"
                         android:textColor="@android:color/white"
-                        android:textSize="22sp"
+                        android:textSize="@dimen/text_xx_large"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/ivThumb"
                         app:layout_constraintTop_toTopOf="@+id/ivThumb"
@@ -76,9 +77,9 @@
                         android:id="@+id/tvDetails"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/details_text_top_margin"
                         android:textColor="@android:color/white"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/text_x_large"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/tvTitle"
                         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />

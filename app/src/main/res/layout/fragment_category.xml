@@ -19,7 +19,7 @@
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/text_extra_large"
+        android:textSize="@dimen/text_xx_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -2,4 +2,6 @@
 <resources>
     <dimen name="status_message_text">22sp</dimen>
     <item name="avi_constraint_vertical_bias" type="dimen">0.5</item>
+    <dimen name="details_card_container_margin">32dp</dimen>
+    <dimen name="details_container_max_width">700dp</dimen>
 </resources>

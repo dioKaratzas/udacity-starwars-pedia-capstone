@@ -242,7 +242,7 @@ public class CategoryFragment extends Fragment {
                 }
             });
             StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
-                    getHandySpanCount(getContext().getResources().getDimensionPixelSize(R.dimen.item_preferred_width),
+                    getHandySpanCount(getContext().getResources().getDimensionPixelSize(R.dimen.category_item_preferred_width),
                             getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset)),
                     LinearLayoutManager.VERTICAL);
             SpacingItemDecoration itemDecoration = new SpacingItemDecoration(getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset));
