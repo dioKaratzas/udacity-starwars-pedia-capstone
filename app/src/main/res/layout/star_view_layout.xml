@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><!--DrawerLayout not drawn with GLSurfaceView as content--><!--https://stackoverflow.com/questions/23691012/drawerlayout-listview-not-drawn-with-glsurfaceview-as-content-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <eu.dkaratzas.starsgl.widget.StarView
+        android:id="@+id/starView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

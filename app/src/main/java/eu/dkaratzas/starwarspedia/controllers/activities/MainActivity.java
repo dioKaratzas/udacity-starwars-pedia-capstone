@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mNavView.setNavigationItemSelectedListener(this);
 
-
         if (savedInstanceState == null) {
             selectDefaultCategory();
         }

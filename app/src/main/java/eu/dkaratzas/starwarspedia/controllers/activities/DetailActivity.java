@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -84,12 +85,11 @@ public class DetailActivity extends AppCompatActivity {
 
 
         RequestOptions requestOptions = new RequestOptions();
-        requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(6));
+        requestOptions = requestOptions.transforms(new FitCenter(), new RoundedCorners(6));
         GlideApp.with(this)
                 .load(mData.getImageStorageReference())
-                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_placeholder)
                 .apply(requestOptions)
-                .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(mIvThumb);
 

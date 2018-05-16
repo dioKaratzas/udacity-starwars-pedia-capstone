@@ -30,7 +30,7 @@
     <item name="avi_constraint_vertical_bias" type="dimen">0.3</item>
 
     <!-- item_category -->
-    <dimen name="thumb_image_height">250dp</dimen>
+    <dimen name="item_preferred_width">250dp</dimen>
     <dimen name="item_title_padding">8dp</dimen>
 
     <!-- status_layout -->

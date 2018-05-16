@@ -48,9 +48,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
         });
         GlideApp.with(mContext)
                 .load(queryData.getImageStorageReference())
-                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop()
+                .fitCenter()
                 .into(holder.mIvThumb);
     }
 

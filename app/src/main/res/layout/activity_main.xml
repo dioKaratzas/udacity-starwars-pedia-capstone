@@ -8,22 +8,7 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <!--DrawerLayout not drawn with GLSurfaceView as content-->
-    <!--https://stackoverflow.com/questions/23691012/drawerlayout-listview-not-drawn-with-glsurfaceview-as-content-->
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <eu.dkaratzas.starsgl.widget.StarView
-            android:id="@+id/starView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+    <include layout="@layout/star_view_layout" />
 
     <include
         layout="@layout/content_main"

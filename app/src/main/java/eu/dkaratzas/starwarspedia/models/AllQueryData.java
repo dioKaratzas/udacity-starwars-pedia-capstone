@@ -447,7 +447,7 @@ public class AllQueryData implements Parcelable {
     }
 
     public StorageReference getImageStorageReference() {
-        String imageName = getTitle().replace('_', '/');
+        String imageName = getTitle().replace('/', '_');
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         switch (category) {

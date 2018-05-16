@@ -5,7 +5,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +26,7 @@ import eu.dkaratzas.starwarspedia.adapters.CategoryAdapter;
 import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
-import eu.dkaratzas.starwarspedia.libs.GridAutofitLayoutManager;
+import eu.dkaratzas.starwarspedia.libs.GridAutoFitLayoutManager;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
@@ -133,8 +135,8 @@ public class CategoryFragment extends Fragment {
         if (mCategoryItems != null) {
             outState.putParcelable(BUNDLE_DATA_KEY, mCategoryItems);
 
-            if (mRecyclerView.getLayoutManager() != null && mRecyclerView.getLayoutManager() instanceof GridAutofitLayoutManager)
-                outState.putInt(BUNDLE_RECYCLER_POSITION, ((GridAutofitLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition());
+            if (mRecyclerView.getLayoutManager() != null && mRecyclerView.getLayoutManager() instanceof GridAutoFitLayoutManager)
+                outState.putInt(BUNDLE_RECYCLER_POSITION, ((GridAutoFitLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition());
         }
     }
 
@@ -239,7 +241,10 @@ public class CategoryFragment extends Fragment {
                     mListener.onCategoryItemClicked(queryData);
                 }
             });
-            GridAutofitLayoutManager layoutManager = new GridAutofitLayoutManager(getContext(), getContext().getResources().getDimensionPixelSize(R.dimen.thumb_image_height));
+            StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
+                    getHandySpanCount(getContext().getResources().getDimensionPixelSize(R.dimen.item_preferred_width),
+                            getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset)),
+                    LinearLayoutManager.VERTICAL);
             SpacingItemDecoration itemDecoration = new SpacingItemDecoration(getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset));
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setLayoutManager(layoutManager);
@@ -254,6 +259,12 @@ public class CategoryFragment extends Fragment {
                     .playOn(mRecyclerView);
         }
     }
+
+    public int getHandySpanCount(int columnWidth, int paddingLeftRight) {
+        int totalSpace = getResources().getDisplayMetrics().widthPixels - (paddingLeftRight * 2);
+        return (int) Math.max(2, (long) Math.ceil((double) totalSpace / columnWidth));
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this

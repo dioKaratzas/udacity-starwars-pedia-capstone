@@ -5,17 +5,17 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 
-public class GridAutofitLayoutManager extends GridLayoutManager {
+public class GridAutoFitLayoutManager extends GridLayoutManager {
     private int mColumnWidth;
     private boolean mColumnWidthChanged = true;
 
-    public GridAutofitLayoutManager(Context context, int columnWidth) {
+    public GridAutoFitLayoutManager(Context context, int columnWidth) {
         /* Initially set spanCount to 1, will be changed automatically later. */
         super(context, 1);
         setColumnWidth(checkedColumnWidth(context, columnWidth));
     }
 
-    public GridAutofitLayoutManager(Context context, int columnWidth, int orientation, boolean reverseLayout) {
+    public GridAutoFitLayoutManager(Context context, int columnWidth, int orientation, boolean reverseLayout) {
         /* Initially set spanCount to 1, will be changed automatically later. */
         super(context, 1, orientation, reverseLayout);
         setColumnWidth(checkedColumnWidth(context, columnWidth));
@@ -50,9 +50,9 @@ public class GridAutofitLayoutManager extends GridLayoutManager {
             } else {
                 totalSpace = height - getPaddingTop() - getPaddingBottom();
             }
-            int spanCount = Math.max(1, totalSpace / mColumnWidth);
+            int spanCount = (int) Math.max(2, (long) Math.ceil((double) totalSpace / mColumnWidth));
             setSpanCount(spanCount);
-            mColumnWidthChanged = false;
+            mColumnWidthChanged = true;
         }
         super.onLayoutChildren(recycler, state);
     }

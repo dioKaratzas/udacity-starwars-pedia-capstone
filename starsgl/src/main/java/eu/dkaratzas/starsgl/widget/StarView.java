@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import eu.dkaratzas.starsgl.particlesys.ParticleSystemRenderer;
+import timber.log.Timber;
 
 /**
  * An animated OpenGL based {@linkplain android.opengl.GLSurfaceView} which can be used to display a space-like overlay in your layout.
@@ -84,9 +85,11 @@ public class StarView extends GLSurfaceView {
 
         if (visibility == View.VISIBLE) {
             //Resume the starView
+            Timber.d("StarView Resumed");
             onResume();
         } else {
             //Pause the starView
+            Timber.d("StarView Paused");
             onPause();
         }
     }
