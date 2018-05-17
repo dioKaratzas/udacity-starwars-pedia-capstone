@@ -8,12 +8,12 @@ import com.google.firebase.storage.StorageReference;
 
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 
-public class QueryData implements Parcelable {
+public class SimpleQueryData implements Parcelable {
     private String id;
     private String title;
     private SwapiCategory category;
 
-    public QueryData(String id, String title, SwapiCategory category) {
+    public SimpleQueryData(String id, String title, SwapiCategory category) {
         this.id = id;
         this.title = title;
         this.category = category;
@@ -66,22 +66,22 @@ public class QueryData implements Parcelable {
         dest.writeInt(this.category == null ? -1 : this.category.ordinal());
     }
 
-    protected QueryData(Parcel in) {
+    protected SimpleQueryData(Parcel in) {
         this.id = in.readString();
         this.title = in.readString();
         int tmpCategory = in.readInt();
         this.category = tmpCategory == -1 ? null : SwapiCategory.values()[tmpCategory];
     }
 
-    public static final Parcelable.Creator<QueryData> CREATOR = new Parcelable.Creator<QueryData>() {
+    public static final Parcelable.Creator<SimpleQueryData> CREATOR = new Parcelable.Creator<SimpleQueryData>() {
         @Override
-        public QueryData createFromParcel(Parcel source) {
-            return new QueryData(source);
+        public SimpleQueryData createFromParcel(Parcel source) {
+            return new SimpleQueryData(source);
         }
 
         @Override
-        public QueryData[] newArray(int size) {
-            return new QueryData[size];
+        public SimpleQueryData[] newArray(int size) {
+            return new SimpleQueryData[size];
         }
     };
 

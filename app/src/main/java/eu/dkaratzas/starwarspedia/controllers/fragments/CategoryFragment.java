@@ -35,11 +35,11 @@ import eu.dkaratzas.starwarspedia.libs.animations.techniques.FadeInAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.PulseAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
 import eu.dkaratzas.starwarspedia.models.CategoryItems;
-import eu.dkaratzas.starwarspedia.models.QueryData;
+import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 import timber.log.Timber;
 
 /**
- * Displays the selected category content of the SwapiModel API.
+ * Displays the selected category's content of the SwapiModel API.
  * Activities that contain this fragment must implement the
  * {@link CategoryFragmentCallbacks} interface
  * to handle interaction events.
@@ -74,7 +74,7 @@ public class CategoryFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param category Parameter 1.
+     * @param category SwapiCategory to fetch.
      * @return A new instance of fragment CategoryFragment.
      */
     public static CategoryFragment newInstance(SwapiCategory category) {
@@ -82,6 +82,7 @@ public class CategoryFragment extends Fragment {
         Bundle args = new Bundle();
         args.putInt(ARG_CATEGORY, category.ordinal());
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -89,6 +90,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null && getArguments().containsKey(ARG_CATEGORY)) {
             mCategory = SwapiCategory.values()[getArguments().getInt(ARG_CATEGORY)];
         }
@@ -97,10 +99,10 @@ public class CategoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_category, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-
 
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_DATA_KEY)) {
             mCategoryItems = savedInstanceState.getParcelable(BUNDLE_DATA_KEY);
@@ -124,7 +126,6 @@ public class CategoryFragment extends Fragment {
             }
         });
 
-
         return view;
     }
 
@@ -143,11 +144,11 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         if (context instanceof CategoryFragmentCallbacks) {
             mListener = (CategoryFragmentCallbacks) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnCategoryClickedListener");
+            throw new RuntimeException(context.toString() + " must implement OnCategoryClickedListener");
         }
     }
 
@@ -166,6 +167,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         Timber.d("onDestroy");
         RefWatcher refWatcher = GlobalApplication.getRefWatcher(getActivity());
         refWatcher.watch(this);
@@ -173,6 +175,9 @@ public class CategoryFragment extends Fragment {
 
     // endregion
 
+    /**
+     * Load selected category items if there is an internet connection available
+     */
     private void loadData() {
         if (Misc.isNetworkAvailable(getActivity().getApplicationContext())) {
             setLoadingStatus(true);
@@ -205,9 +210,6 @@ public class CategoryFragment extends Fragment {
         mListener.onCategoryDataLoading(loadingStatus);
 
         if (loadingStatus) {
-            // hide status message if is visible
-//            hideStatus(0);
-
             // show loading indicator
             mAvi.smoothToShow();
         } else {
@@ -233,26 +235,30 @@ public class CategoryFragment extends Fragment {
             mIvRefresh.setVisibility(View.GONE);
     }
 
-    private void setUpRecycler(int position) {
+    private void setUpRecycler(int scrollToPosition) {
+
         if (mCategoryItems != null) {
+
             CategoryAdapter categoryAdapter = new CategoryAdapter(getContext(), mCategoryItems, new CategoryAdapter.OnItemClickListener() {
                 @Override
-                public void onItemClick(QueryData queryData) {
+                public void onItemClick(SimpleQueryData queryData) {
                     mListener.onCategoryItemClicked(queryData);
                 }
             });
+
             StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
-                    getHandySpanCount(getContext().getResources().getDimensionPixelSize(R.dimen.category_item_preferred_width),
-                            getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset)),
+                    getHandySpanCount(getContext().getResources().getDimensionPixelSize(R.dimen.category_item_preferred_width), getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset)),
                     LinearLayoutManager.VERTICAL);
+
             SpacingItemDecoration itemDecoration = new SpacingItemDecoration(getContext().getResources().getDimensionPixelSize(R.dimen.category_recycler_item_offset));
+
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.addItemDecoration(itemDecoration);
             mRecyclerView.setAdapter(categoryAdapter);
 
-            if (position != 0)
-                layoutManager.scrollToPosition(position);
+            if (scrollToPosition != 0)
+                layoutManager.scrollToPosition(scrollToPosition);
 
             YoYo.with(new SlideInUpAnimator())
                     .duration(400)
@@ -260,11 +266,17 @@ public class CategoryFragment extends Fragment {
         }
     }
 
+    /**
+     * Returns a handy span count starting from 2 based on a preferred item width
+     *
+     * @param columnWidth      The preferred column width
+     * @param paddingLeftRight The padding that applies left of the first item and right of the last
+     * @return SpanCount
+     */
     public int getHandySpanCount(int columnWidth, int paddingLeftRight) {
         int totalSpace = getResources().getDisplayMetrics().widthPixels - (paddingLeftRight * 2);
         return (int) Math.max(2, (long) Math.ceil((double) totalSpace / columnWidth));
     }
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -277,7 +289,7 @@ public class CategoryFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface CategoryFragmentCallbacks {
-        void onCategoryItemClicked(QueryData queryData);
+        void onCategoryItemClicked(SimpleQueryData queryData);
 
         void onCategoryDataLoading(boolean loading);
     }

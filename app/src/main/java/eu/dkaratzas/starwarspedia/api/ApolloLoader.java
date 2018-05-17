@@ -1,8 +1,8 @@
 package eu.dkaratzas.starwarspedia.api;
 
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
@@ -11,7 +11,6 @@ import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
 import javax.annotation.Nonnull;
-
 
 /**
  * Loader implementation for Apollo Call API.
@@ -33,13 +32,9 @@ class ApolloLoader<T> extends Loader<ResultHolder<T>> {
      * @param call     The call to be executed.
      * @param callback The Apollo callback.
      */
-
-    public static <T> void load(Context context, LoaderManager manager,
-                                int id, ApolloCall<T> call, ApolloCall.Callback<T> callback) {
-        manager.initLoader(id, null, new LoaderCallbacksDelegator<>(
-                context, call, callback));
+    public static <T> void load(Context context, LoaderManager manager, int id, ApolloCall<T> call, ApolloCall.Callback<T> callback) {
+        manager.initLoader(id, null, new LoaderCallbacksDelegator<>(context, call, callback));
     }
-
 
     /**
      * Reload the provided {@link ApolloCall} using the {@link LoaderManager},
@@ -53,35 +48,29 @@ class ApolloLoader<T> extends Loader<ResultHolder<T>> {
      * @param call     The call to be executed.
      * @param callback The Apollo callback.
      */
-
-    public static <T> void reload(Context context, LoaderManager manager,
-                                  int id, ApolloCall<T> call, ApolloCall.Callback<T> callback) {
-        manager.restartLoader(id, null, new LoaderCallbacksDelegator<>(
-                context, call, callback));
+    public static <T> void reload(Context context, LoaderManager manager, int id, ApolloCall<T> call, ApolloCall.Callback<T> callback) {
+        manager.restartLoader(id, null, new LoaderCallbacksDelegator<>(context, call, callback));
     }
 
-    static class LoaderCallbacksDelegator<T>
-            implements LoaderManager.LoaderCallbacks<ResultHolder<T>> {
+    static class LoaderCallbacksDelegator<T> implements LoaderManager.LoaderCallbacks<ResultHolder<T>> {
         private final Context context;
         private final ApolloCall<T> call;
         private final ApolloCall.Callback<T> callback;
 
-        LoaderCallbacksDelegator(Context context,
-                                 ApolloCall<T> call, ApolloCall.Callback<T> callback) {
+        LoaderCallbacksDelegator(Context context, ApolloCall<T> call, ApolloCall.Callback<T> callback) {
             this.context = context;
             this.call = call;
             this.callback = callback;
         }
 
+        @NonNull
         @Override
-        public Loader<ResultHolder<T>> onCreateLoader(
-                int id, Bundle args) {
+        public Loader<ResultHolder<T>> onCreateLoader(int id, Bundle args) {
             return new ApolloLoader<>(context, call);
         }
 
         @Override
-        public void onLoadFinished(Loader<ResultHolder<T>> loader,
-                                   ResultHolder<T> resultHolder) {
+        public void onLoadFinished(@NonNull Loader<ResultHolder<T>> loader, ResultHolder<T> resultHolder) {
             Response<T> response;
             try {
                 response = resultHolder.get();
@@ -93,7 +82,7 @@ class ApolloLoader<T> extends Loader<ResultHolder<T>> {
         }
 
         @Override
-        public void onLoaderReset(Loader<ResultHolder<T>> loader) {
+        public void onLoaderReset(@NonNull Loader<ResultHolder<T>> loader) {
         }
     }
 

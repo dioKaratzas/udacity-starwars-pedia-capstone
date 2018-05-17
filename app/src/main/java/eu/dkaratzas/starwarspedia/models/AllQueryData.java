@@ -24,12 +24,15 @@ import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import timber.log.Timber;
 
+/**
+ * Mapping apollo result for the ItemDataById GraphQL Responses
+ */
 public class AllQueryData implements Parcelable {
     private String id;
     private String title;
     private SwapiCategory category;
     private LinkedHashMap<String, String> detailsMap;
-    private LinkedHashMap<String, List<QueryData>> relatedItems;
+    private LinkedHashMap<String, List<SimpleQueryData>> relatedItems;
 
     public AllQueryData(Response response, Context context) {
 
@@ -52,7 +55,7 @@ public class AllQueryData implements Parcelable {
             }
 
         } else {
-            Timber.d("response data is null");
+            Timber.d("Response data is null");
         }
     }
 
@@ -73,45 +76,45 @@ public class AllQueryData implements Parcelable {
             detailsMap.put(context.getString(R.string.opening_crawl), getSafeString(film.openingCrawl()));
 
             if (film.characters() != null && film.characters().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (FilmQuery.Character character : film.characters()) {
-                    items.add(new QueryData(character.id(), character.name(), SwapiCategory.PEOPLE));
+                    items.add(new SimpleQueryData(character.id(), character.name(), SwapiCategory.PEOPLE));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.people)), items);
             }
 
             if (film.planets() != null && film.planets().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (FilmQuery.Planet planet : film.planets()) {
-                    items.add(new QueryData(planet.id(), planet.name(), SwapiCategory.PLANET));
+                    items.add(new SimpleQueryData(planet.id(), planet.name(), SwapiCategory.PLANET));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.planets)), items);
             }
 
             if (film.species() != null && film.species().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (FilmQuery.Species species : film.species()) {
-                    items.add(new QueryData(species.id(), species.name(), SwapiCategory.SPECIES));
+                    items.add(new SimpleQueryData(species.id(), species.name(), SwapiCategory.SPECIES));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.species)), items);
             }
 
             if (film.starships() != null && film.starships().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (FilmQuery.Starship starship : film.starships()) {
-                    items.add(new QueryData(starship.id(), starship.name(), SwapiCategory.STARSHIP));
+                    items.add(new SimpleQueryData(starship.id(), starship.name(), SwapiCategory.STARSHIP));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.starships)), items);
             }
 
             if (film.vehicles() != null && film.vehicles().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (FilmQuery.Vehicle vehicle : film.vehicles()) {
-                    items.add(new QueryData(vehicle.id(), vehicle.name(), SwapiCategory.VEHICLE));
+                    items.add(new SimpleQueryData(vehicle.id(), vehicle.name(), SwapiCategory.VEHICLE));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.vehicles)), items);
@@ -143,44 +146,44 @@ public class AllQueryData implements Parcelable {
                 detailsMap.put(context.getString(R.string.skin_color), skinColor);
 
             if (person.homeworld() != null) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
 
-                items.add(new QueryData(person.homeworld().id(), person.homeworld().name(), SwapiCategory.PLANET));
+                items.add(new SimpleQueryData(person.homeworld().id(), person.homeworld().name(), SwapiCategory.PLANET));
 
                 relatedItems.put(context.getString(R.string.homeworld), items);
             }
 
             if (person.films() != null && person.films().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (PersonQuery.Film film : person.films()) {
-                    items.add(new QueryData(film.id(), film.title(), SwapiCategory.FILM));
+                    items.add(new SimpleQueryData(film.id(), film.title(), SwapiCategory.FILM));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), items);
             }
 
             if (person.species() != null && person.species().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (PersonQuery.Species species : person.species()) {
-                    items.add(new QueryData(species.id(), species.name(), SwapiCategory.SPECIES));
+                    items.add(new SimpleQueryData(species.id(), species.name(), SwapiCategory.SPECIES));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.species)), items);
             }
 
             if (person.starships() != null && person.starships().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (PersonQuery.Starship starship : person.starships()) {
-                    items.add(new QueryData(starship.id(), starship.name(), SwapiCategory.STARSHIP));
+                    items.add(new SimpleQueryData(starship.id(), starship.name(), SwapiCategory.STARSHIP));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.starships)), items);
             }
 
             if (person.vehicles() != null && person.vehicles().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (PersonQuery.Vehicle vehicle : person.vehicles()) {
-                    items.add(new QueryData(vehicle.id(), vehicle.name(), SwapiCategory.VEHICLE));
+                    items.add(new SimpleQueryData(vehicle.id(), vehicle.name(), SwapiCategory.VEHICLE));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.vehicles)), items);
@@ -209,18 +212,18 @@ public class AllQueryData implements Parcelable {
 
 
             if (planet.residents() != null && planet.residents().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (PlanetQuery.Resident resident : planet.residents()) {
-                    items.add(new QueryData(resident.id(), resident.name(), SwapiCategory.PEOPLE));
+                    items.add(new SimpleQueryData(resident.id(), resident.name(), SwapiCategory.PEOPLE));
                 }
 
                 relatedItems.put(context.getString(R.string.residents), items);
             }
 
             if (planet.films() != null && planet.films().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (PlanetQuery.Film film : planet.films()) {
-                    items.add(new QueryData(film.id(), film.title(), SwapiCategory.FILM));
+                    items.add(new SimpleQueryData(film.id(), film.title(), SwapiCategory.FILM));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), items);
@@ -259,18 +262,18 @@ public class AllQueryData implements Parcelable {
                 detailsMap.put(context.getString(R.string.eye_color), eyeColor);
 
             if (species.people() != null && species.people().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (SpeciesQuery.person people : species.people()) {
-                    items.add(new QueryData(people.id(), people.name(), SwapiCategory.PEOPLE));
+                    items.add(new SimpleQueryData(people.id(), people.name(), SwapiCategory.PEOPLE));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.people)), items);
             }
 
             if (species.films() != null && species.films().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (SpeciesQuery.Film film : species.films()) {
-                    items.add(new QueryData(film.id(), film.title(), SwapiCategory.FILM));
+                    items.add(new SimpleQueryData(film.id(), film.title(), SwapiCategory.FILM));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), items);
@@ -301,18 +304,18 @@ public class AllQueryData implements Parcelable {
             detailsMap.put(context.getString(R.string.consumables), getSafeString(starship.consumables()));
 
             if (starship.pilots() != null && starship.pilots().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (StarshipQuery.Pilot pilot : starship.pilots()) {
-                    items.add(new QueryData(pilot.id(), pilot.name(), SwapiCategory.PEOPLE));
+                    items.add(new SimpleQueryData(pilot.id(), pilot.name(), SwapiCategory.PEOPLE));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.pilots)), items);
             }
 
             if (starship.films() != null && starship.films().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (StarshipQuery.Film film : starship.films()) {
-                    items.add(new QueryData(film.id(), film.title(), SwapiCategory.FILM));
+                    items.add(new SimpleQueryData(film.id(), film.title(), SwapiCategory.FILM));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), items);
@@ -342,18 +345,18 @@ public class AllQueryData implements Parcelable {
             detailsMap.put(context.getString(R.string.consumables), getSafeString(vehicle.consumables()));
 
             if (vehicle.pilots() != null && vehicle.pilots().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (VehicleQuery.Pilot pilot : vehicle.pilots()) {
-                    items.add(new QueryData(pilot.id(), pilot.name(), SwapiCategory.PEOPLE));
+                    items.add(new SimpleQueryData(pilot.id(), pilot.name(), SwapiCategory.PEOPLE));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.pilots)), items);
             }
 
             if (vehicle.films() != null && vehicle.films().size() > 0) {
-                List<QueryData> items = new ArrayList<>();
+                List<SimpleQueryData> items = new ArrayList<>();
                 for (VehicleQuery.Film film : vehicle.films()) {
-                    items.add(new QueryData(film.id(), film.title(), SwapiCategory.FILM));
+                    items.add(new SimpleQueryData(film.id(), film.title(), SwapiCategory.FILM));
                 }
 
                 relatedItems.put(String.format(context.getString(R.string.related), context.getString(R.string.films)), items);
@@ -438,7 +441,7 @@ public class AllQueryData implements Parcelable {
         return detailsMap;
     }
 
-    public LinkedHashMap<String, List<QueryData>> getRelatedItems() {
+    public LinkedHashMap<String, List<SimpleQueryData>> getRelatedItems() {
         return relatedItems;
     }
 
@@ -486,7 +489,7 @@ public class AllQueryData implements Parcelable {
         }
         dest.writeInt(this.category == null ? -1 : this.category.ordinal());
         dest.writeInt(this.relatedItems.size());
-        for (Map.Entry<String, List<QueryData>> entry : this.relatedItems.entrySet()) {
+        for (Map.Entry<String, List<SimpleQueryData>> entry : this.relatedItems.entrySet()) {
             dest.writeString(entry.getKey());
             dest.writeTypedList(entry.getValue());
         }
@@ -496,7 +499,7 @@ public class AllQueryData implements Parcelable {
         this.id = in.readString();
         this.title = in.readString();
         int detailsMapSize = in.readInt();
-        this.detailsMap = new LinkedHashMap<String, String>(detailsMapSize);
+        this.detailsMap = new LinkedHashMap<>(detailsMapSize);
         for (int i = 0; i < detailsMapSize; i++) {
             String key = in.readString();
             String value = in.readString();
@@ -505,10 +508,10 @@ public class AllQueryData implements Parcelable {
         int tmpCategory = in.readInt();
         this.category = tmpCategory == -1 ? null : SwapiCategory.values()[tmpCategory];
         int relatedItemsSize = in.readInt();
-        this.relatedItems = new LinkedHashMap<String, List<QueryData>>(relatedItemsSize);
+        this.relatedItems = new LinkedHashMap<>(relatedItemsSize);
         for (int i = 0; i < relatedItemsSize; i++) {
             String key = in.readString();
-            List<QueryData> value = in.createTypedArrayList(QueryData.CREATOR);
+            List<SimpleQueryData> value = in.createTypedArrayList(SimpleQueryData.CREATOR);
             this.relatedItems.put(key, value);
         }
     }

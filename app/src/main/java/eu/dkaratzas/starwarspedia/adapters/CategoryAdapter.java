@@ -14,7 +14,7 @@ import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.holders.CategoryViewHolder;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
 import eu.dkaratzas.starwarspedia.models.CategoryItems;
-import eu.dkaratzas.starwarspedia.models.QueryData;
+import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
     private Context mContext;
@@ -36,7 +36,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-        final QueryData queryData = mCategoryItems.getQueryDataList().get(position);
+        final SimpleQueryData queryData = mCategoryItems.getQueryDataList().get(position);
         holder.mTitle.setText(queryData.getTitle());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,6 +46,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
                 }
             }
         });
+
         GlideApp.with(mContext)
                 .load(queryData.getImageStorageReference())
                 .error(R.drawable.ic_image_placeholder)
@@ -60,6 +61,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> {
     }
 
     public interface OnItemClickListener {
-        void onItemClick(QueryData queryData);
+        void onItemClick(SimpleQueryData queryData);
     }
 }

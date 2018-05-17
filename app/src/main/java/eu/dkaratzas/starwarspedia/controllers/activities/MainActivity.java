@@ -27,7 +27,7 @@ import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.models.AllQueryData;
-import eu.dkaratzas.starwarspedia.models.QueryData;
+import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CategoryFragment.CategoryFragmentCallbacks {
 
@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (selectedItemId != id) {
@@ -125,20 +124,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-
+    /**
+     * Fetch the item by ID and start DetailsActivity to show its details
+     *
+     * @param queryData Items result
+     */
     @Override
-    public void onCategoryItemClicked(QueryData queryData) {
+    public void onCategoryItemClicked(final SimpleQueryData queryData) {
         getSupportLoaderManager().destroyLoader(LOADER_ID);
+
         if (queryData != null) {
             ApolloManager.instance().fetchSwapiItem(this, queryData.getId(), queryData.getCategory(), getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<AllQueryData>() {
                 @Override
                 public void onResponse(AllQueryData result) {
                     getSupportLoaderManager().destroyLoader(LOADER_ID);
+
                     if (result == null) {
                         StatusMessage.show(MainActivity.this, getString(R.string.error_getting_data));
                     } else {
                         Bundle bundle = new Bundle();
                         bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, result);
+                        bundle.putString(DetailActivity.EXTRA_CURRENT_CATEGORY_TITLE, queryData.getCategory().getString(getApplicationContext()));
                         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
                         intent.putExtras(bundle);
                         startActivity(intent);
@@ -162,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mAppBar != null)
             mAppBar.setExpanded(true, true);
 
-        // Destroy the Loader of the fragment
+        // Destroy the Loader if was loaded previously
         getSupportLoaderManager().destroyLoader(CategoryFragment.LOADER_ID);
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_upward_in, R.anim.slide_down_out, R.anim.slide_upward_in, R.anim.slide_down_out)

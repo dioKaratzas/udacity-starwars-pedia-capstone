@@ -1,6 +1,5 @@
 package eu.dkaratzas.starwarspedia.api;
 
-
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 

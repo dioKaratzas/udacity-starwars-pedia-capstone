@@ -15,14 +15,14 @@ import java.util.List;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.holders.RelatedToViewHolder;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
-import eu.dkaratzas.starwarspedia.models.QueryData;
+import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 
 public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> {
     private Context mContext;
-    private List<QueryData> mDataList;
+    private List<SimpleQueryData> mDataList;
     private OnItemClickListener mClickListener;
 
-    public RelatedToAdapter(Context context, List<QueryData> dataList, OnItemClickListener itemClickListener) {
+    public RelatedToAdapter(Context context, List<SimpleQueryData> dataList, OnItemClickListener itemClickListener) {
         mContext = context;
         mDataList = dataList;
         mClickListener = itemClickListener;
@@ -37,7 +37,7 @@ public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull RelatedToViewHolder holder, @SuppressLint("RecyclerView") final int position) {
-        final QueryData queryData = mDataList.get(position);
+        final SimpleQueryData queryData = mDataList.get(position);
         holder.mTitle.setText(queryData.getTitle());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +61,6 @@ public class RelatedToAdapter extends RecyclerView.Adapter<RelatedToViewHolder> 
     }
 
     public interface OnItemClickListener {
-        void onItemClick(QueryData queryData);
+        void onItemClick(SimpleQueryData queryData);
     }
 }
