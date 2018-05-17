@@ -23,6 +23,11 @@
         <activity
             android:name=".controllers.activities.DetailActivity"
             android:theme="@style/AppTheme" />
+
+        <provider
+            android:name=".provider.FavouriteItemsProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false" />
     </application>
 
 </manifest>

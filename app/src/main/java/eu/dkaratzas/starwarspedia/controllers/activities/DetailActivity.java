@@ -1,6 +1,11 @@
 package eu.dkaratzas.starwarspedia.controllers.activities;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -32,10 +37,12 @@ import eu.dkaratzas.starwarspedia.adapters.RelatedToAdapter;
 import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
+import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.models.AllQueryData;
 import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
+import eu.dkaratzas.starwarspedia.provider.FavouriteItemsContract;
 import timber.log.Timber;
 
 public class DetailActivity extends AppCompatActivity {
@@ -46,6 +53,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private AllQueryData mData;
     private String mCurrentCategoryTitle;
+    private boolean mIsFavourite = false;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -75,7 +83,6 @@ public class DetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             publishUI();
-
         } else {
             throw new IllegalArgumentException("Must provide an AllQueryData and Category's Fragment current category as intent extras to display it's data and set the toolbars title.");
         }
@@ -185,6 +192,55 @@ public class DetailActivity extends AppCompatActivity {
         mLinearContainer.addView(tvTitle);
         mLinearContainer.addView(view);
     }
+
+    private boolean isFavouriteItem() {
+
+        final Cursor cursor;
+        cursor = getApplicationContext().getContentResolver().query(FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI, null, "swapi_id=?", new String[]{String.valueOf(mData.getId())}, null);
+
+        boolean result = cursor.getCount() > 0;
+        cursor.close();
+
+        return result;
+    }
+
+    /**
+     * Add or delete the item from favourites
+     */
+    void switchFavouriteStatus(Drawable drawable) {
+
+        if (mIsFavourite) {
+            Uri uri = FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI;
+            uri = uri.buildUpon().appendPath(String.valueOf(mData.getId())).build();
+            int returnUri = getApplicationContext().getContentResolver().delete(uri, null, null);
+            Timber.d("ReturnUri: %s", returnUri);
+
+            getApplicationContext().getContentResolver().notifyChange(uri, null);
+
+            mIsFavourite = !mIsFavourite;
+//            switchFabStyle();
+            StatusMessage.show(this, mData.getTitle() + " " + getString(R.string.removed_from_favourite));
+        } else {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_ID, mData.getId());
+            contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_TITLE, mData.getTitle());
+            contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_CATEGORY, mData.getCategory().ordinal());
+
+            String imageBase64 = Misc.bitmapToBase64(((BitmapDrawable) drawable).getBitmap());
+            contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_IMAGE, imageBase64);
+
+
+            Uri uri = getApplicationContext().getContentResolver().insert(FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI, contentValues);
+            if (uri != null) {
+                mIsFavourite = !mIsFavourite;
+//                switchFabStyle();
+                StatusMessage.show(this, mData.getTitle() + " " + getString(R.string.added_to_favourite));
+            } else {
+                Timber.d("Uri null");
+            }
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
