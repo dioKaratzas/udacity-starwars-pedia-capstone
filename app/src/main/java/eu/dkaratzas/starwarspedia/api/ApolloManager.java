@@ -3,8 +3,8 @@ package eu.dkaratzas.starwarspedia.api;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
-import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -84,7 +83,7 @@ public class ApolloManager implements Serializable {
             }
 
             @Override
-            public CustomTypeValue encode(Date value) {
+            public CustomTypeValue encode(@NonNull Date value) {
                 return new CustomTypeValue.GraphQLString(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(value));
             }
         };

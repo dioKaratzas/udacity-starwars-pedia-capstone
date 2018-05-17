@@ -26,7 +26,6 @@ import eu.dkaratzas.starwarspedia.adapters.CategoryAdapter;
 import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
-import eu.dkaratzas.starwarspedia.libs.GridAutoFitLayoutManager;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
@@ -136,8 +135,10 @@ public class CategoryFragment extends Fragment {
         if (mCategoryItems != null) {
             outState.putParcelable(BUNDLE_DATA_KEY, mCategoryItems);
 
-            if (mRecyclerView.getLayoutManager() != null && mRecyclerView.getLayoutManager() instanceof GridAutoFitLayoutManager)
-                outState.putInt(BUNDLE_RECYCLER_POSITION, ((GridAutoFitLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition());
+            if (mRecyclerView.getLayoutManager() != null && mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+                int[] positions = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null);
+                outState.putInt(BUNDLE_RECYCLER_POSITION, (positions[0] > 0) ? positions[0] : 0);
+            }
         }
     }
 

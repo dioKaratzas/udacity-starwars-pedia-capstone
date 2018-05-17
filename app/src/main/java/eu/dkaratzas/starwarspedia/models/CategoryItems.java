@@ -78,7 +78,7 @@ public class CategoryItems implements Parcelable {
     }
 
     protected CategoryItems(Parcel in) {
-        this.queryDataList = new ArrayList<SimpleQueryData>();
+        this.queryDataList = new ArrayList<>();
         in.readList(this.queryDataList, SimpleQueryData.class.getClassLoader());
     }
 

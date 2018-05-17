@@ -365,32 +365,32 @@ public class AllQueryData implements Parcelable {
     }
 
     private String getSafeString(Object value) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         if (value != null) {
 
             if (value instanceof String)
-                result = (String) value;
+                result = new StringBuilder((String) value);
 
             if (value instanceof Long || value instanceof Double)
-                result = String.valueOf(value);
+                result = new StringBuilder(String.valueOf(value));
 
             if (value instanceof Enum)
-                result = firstLetterCaps(value.toString());
+                result = new StringBuilder(firstLetterCaps(value.toString()));
 
             if (value instanceof List) {
                 int count = 0;
                 for (Object item : (List) value) {
                     if (item instanceof String) {
                         if (count != 0)
-                            result += ", ";
+                            result.append(", ");
 
-                        result += firstLetterCaps((String) item);
+                        result.append(firstLetterCaps((String) item));
                         count++;
                     }
                 }
             }
         }
-        return result;
+        return result.toString();
     }
 
     private String getListEnumValuesFormatted(Object enumValues) {
