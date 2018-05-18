@@ -27,7 +27,7 @@ public class FavouriteItemsProvider extends ContentProvider {
     public static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(FavouriteItemsContract.CONTENT_AUTHORITY, FavouriteItemsContract.PATH_FAVOURITES, FAVOURITE_ITEMS);
-        uriMatcher.addURI(FavouriteItemsContract.CONTENT_AUTHORITY, FavouriteItemsContract.PATH_FAVOURITES + "/#", FAVOURITE_ITEM_WITH_ID);
+        uriMatcher.addURI(FavouriteItemsContract.CONTENT_AUTHORITY, FavouriteItemsContract.PATH_FAVOURITES + "/*", FAVOURITE_ITEM_WITH_ID);
 
         return uriMatcher;
     }
@@ -92,7 +92,7 @@ public class FavouriteItemsProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case FAVOURITE_ITEM_WITH_ID:
                 String id = uri.getPathSegments().get(1);
-                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(TABLE_NAME, "movie_id=?", new String[]{id});
+                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(TABLE_NAME, FavouriteItemsContract.FavouriteItemEntry.COLUMN_ID + "=?", new String[]{id});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

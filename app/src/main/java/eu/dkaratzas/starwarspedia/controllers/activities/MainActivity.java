@@ -23,13 +23,14 @@ import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.controllers.fragments.CategoryFragment;
+import eu.dkaratzas.starwarspedia.controllers.fragments.FavouritesFragment;
 import eu.dkaratzas.starwarspedia.libs.CustomDrawerButton;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.models.AllQueryData;
 import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CategoryFragment.CategoryFragmentCallbacks {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CategoryFragment.CategoryFragmentCallbacks, FavouritesFragment.FavouritesFragmentCallbacks {
 
     private static final int LOADER_ID = 90;
 
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.appBar)
     AppBarLayout mAppBar;
 
-    private int selectedItemId;
+    private int mSelectedItemId;
+    private boolean mOnFavouriteCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,38 +92,100 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mOnFavouriteCategory)
+            fetchAndShowFavourites();
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (selectedItemId != id) {
+        if (mSelectedItemId != id) {
 
-            selectedItemId = id;
+            StatusMessage.hide();
+
+            mSelectedItemId = id;
 
             switch (id) {
                 case R.id.nav_people:
-                    showCategory(SwapiCategory.PEOPLE);
+                    fetchAndShowCategory(SwapiCategory.PEOPLE);
                     break;
                 case R.id.nav_films:
-                    showCategory(SwapiCategory.FILM);
+                    fetchAndShowCategory(SwapiCategory.FILM);
                     break;
                 case R.id.nav_sparships:
-                    showCategory(SwapiCategory.STARSHIP);
+                    fetchAndShowCategory(SwapiCategory.STARSHIP);
                     break;
                 case R.id.nav_vehicles:
-                    showCategory(SwapiCategory.VEHICLE);
+                    fetchAndShowCategory(SwapiCategory.VEHICLE);
                     break;
                 case R.id.nav_species:
-                    showCategory(SwapiCategory.SPECIES);
+                    fetchAndShowCategory(SwapiCategory.SPECIES);
                     break;
                 case R.id.nav_planets:
-                    showCategory(SwapiCategory.PLANET);
+                    fetchAndShowCategory(SwapiCategory.PLANET);
+                    break;
+                case R.id.nav_favourites:
+                    fetchAndShowFavourites();
                     break;
             }
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void fetchAndShowCategory(final SwapiCategory category) {
+
+        mOnFavouriteCategory = false;
+        // if we are on small screen devices and AppBarLayout exists expand it
+        if (mAppBar != null)
+            mAppBar.setExpanded(true, true);
+
+        destroyLoaders();
+
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_upward_in, R.anim.slide_down_out, R.anim.slide_upward_in, R.anim.slide_down_out)
+                .replace(R.id.container, CategoryFragment.newInstance(category))
+                .commit();
+    }
+
+    private void fetchAndShowFavourites() {
+        mOnFavouriteCategory = true;
+        // if we are on small screen devices and AppBarLayout exists expand it
+        if (mAppBar != null)
+            mAppBar.setExpanded(true, true);
+
+        destroyLoaders();
+
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_upward_in, R.anim.slide_down_out, R.anim.slide_upward_in, R.anim.slide_down_out)
+                .replace(R.id.container, FavouritesFragment.newInstance())
+                .commit();
+    }
+
+    private void destroyLoaders() {
+        // Destroy the Loader if was loaded previously
+        getSupportLoaderManager().destroyLoader(CategoryFragment.LOADER_ID);
+        getSupportLoaderManager().destroyLoader(FavouritesFragment.LOADER_ID);
+    }
+
+    private void selectDefaultCategory() {
+        MenuItem menuItem = mNavView.getMenu().getItem(0);
+        menuItem.setChecked(true);
+        onNavigationItemSelected(menuItem);
+    }
+
+    @Override
+    public void onFavouriteItemClicked(SimpleQueryData queryData) {
+        onItemClicked(queryData, getString(R.string.favourites));
+    }
+
+    @Override
+    public void onFavouriteDataLoading(boolean loading) {
+        onLoadingData(loading);
     }
 
     /**
@@ -131,54 +195,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Override
     public void onCategoryItemClicked(final SimpleQueryData queryData) {
-        getSupportLoaderManager().destroyLoader(LOADER_ID);
-
-        if (queryData != null) {
-            ApolloManager.instance().fetchSwapiItem(this, queryData.getId(), queryData.getCategory(), getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<AllQueryData>() {
-                @Override
-                public void onResponse(AllQueryData result) {
-                    getSupportLoaderManager().destroyLoader(LOADER_ID);
-
-                    if (result == null) {
-                        StatusMessage.show(MainActivity.this, getString(R.string.error_getting_data));
-                    } else {
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, result);
-                        bundle.putString(DetailActivity.EXTRA_CURRENT_CATEGORY_TITLE, queryData.getCategory().getString(getApplicationContext()));
-                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    }
-                }
-            });
-
-        }
+        onItemClicked(queryData, queryData.getCategory().getString(getApplicationContext()));
     }
 
     @Override
     public void onCategoryDataLoading(boolean loading) {
+        onLoadingData(loading);
+    }
+
+    private void onLoadingData(boolean loading) {
         if (loading)
             mStarView.setSpeedFastTraveling();
         else
             mStarView.setSpeedNormal();
     }
 
-    private void showCategory(SwapiCategory category) {
-        // if we are on small screen devices and AppBarLayout exists expand it
-        if (mAppBar != null)
-            mAppBar.setExpanded(true, true);
+    private void onItemClicked(final SimpleQueryData queryData, final String categoryTitle) {
+        getSupportLoaderManager().destroyLoader(LOADER_ID);
+        if (Misc.isNetworkAvailable(getApplicationContext())) {
+            if (queryData != null) {
+                ApolloManager.instance().fetchSwapiItem(this, queryData.getId(), queryData.getCategory(), getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<AllQueryData>() {
+                    @Override
+                    public void onResponse(AllQueryData result) {
+                        getSupportLoaderManager().destroyLoader(LOADER_ID);
 
-        // Destroy the Loader if was loaded previously
-        getSupportLoaderManager().destroyLoader(CategoryFragment.LOADER_ID);
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_upward_in, R.anim.slide_down_out, R.anim.slide_upward_in, R.anim.slide_down_out)
-                .replace(R.id.container, CategoryFragment.newInstance(category))
-                .commit();
-    }
+                        if (result == null) {
+                            StatusMessage.show(MainActivity.this, getString(R.string.error_getting_data));
+                        } else {
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable(DetailActivity.EXTRA_DATA_TO_DISPLAY, result);
+                            bundle.putString(DetailActivity.EXTRA_CURRENT_CATEGORY_TITLE, categoryTitle);
+                            Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        }
+                    }
+                });
 
-    private void selectDefaultCategory() {
-        MenuItem menuItem = mNavView.getMenu().getItem(0);
-        menuItem.setChecked(true);
-        onNavigationItemSelected(menuItem);
+            }
+        } else {
+            StatusMessage.show(this, getResources().getString(R.string.no_internet));
+        }
     }
 }

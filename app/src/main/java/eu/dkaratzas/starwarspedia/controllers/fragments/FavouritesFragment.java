@@ -1,6 +1,5 @@
 package eu.dkaratzas.starwarspedia.controllers.fragments;
 
-import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -37,8 +36,6 @@ import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.libs.animations.YoYo;
-import eu.dkaratzas.starwarspedia.libs.animations.techniques.FadeInAnimator;
-import eu.dkaratzas.starwarspedia.libs.animations.techniques.PulseAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
 import eu.dkaratzas.starwarspedia.models.CategoryItems;
 import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
@@ -183,32 +180,12 @@ public class FavouritesFragment extends Fragment implements LoaderManager.Loader
         mListener.onFavouriteDataLoading(loadingStatus);
 
         if (loadingStatus) {
-            // hide status message if is visible
-//            hideStatus(0);
-
             // show loading indicator
             mAvi.smoothToShow();
         } else {
             // hide loading indicator
             mAvi.hide();
         }
-
-        if (mFavouriteItems == null && !loadingStatus)
-            // if data failed to load show the refresh button
-            YoYo.with(new FadeInAnimator())
-                    .duration(300)
-                    .onEnd(new YoYo.AnimatorCallback() {
-                        @Override
-                        public void call(Animator animator) {
-                            YoYo.with(new PulseAnimator())
-                                    .repeat(3)
-                                    .playOn(mIvRefresh);
-                        }
-                    })
-                    .playOn(mIvRefresh);
-        else if (loadingStatus)
-            // else hide it
-            mIvRefresh.setVisibility(View.GONE);
     }
 
     private void setUpRecycler(int scrollToPosition) {
@@ -296,11 +273,12 @@ public class FavouritesFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         if (data != null && data.getCount() > 0) {
+            mTvTitle.setText(getString(R.string.favourites));
             mapDataAndSetRecycler(data);
         } else {
-            StatusMessage.show(getActivity(), getString(R.string.no_favourites_message));
+            StatusMessage.show(getActivity(), getString(R.string.no_favourites_message), false);
         }
-
+        getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
         setLoadingStatus(false);
     }
 

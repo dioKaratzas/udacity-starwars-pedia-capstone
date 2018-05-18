@@ -3,6 +3,7 @@ package eu.dkaratzas.starwarspedia.controllers.fragments;
 import android.animation.Animator;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -183,22 +184,28 @@ public class CategoryFragment extends Fragment {
         if (Misc.isNetworkAvailable(getActivity().getApplicationContext())) {
             setLoadingStatus(true);
 
-            ApolloManager.instance().fetchSwapiCategory(getActivity(), mCategory, getActivity().getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<CategoryItems>() {
+            // delay 1.5 second to give some time see the animations because tha API with the power of GraphQL is so fast!!!
+            new Handler().postDelayed(new Runnable() {
                 @Override
-                public void onResponse(CategoryItems result) {
-                    if (result == null) {
-                        StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
-                    } else {
-                        mTvTitle.setText(mCategory.getString(getContext()));
-                    }
+                public void run() {
+                    ApolloManager.instance().fetchSwapiCategory(getActivity(), mCategory, getActivity().getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<CategoryItems>() {
+                        @Override
+                        public void onResponse(CategoryItems result) {
+                            if (result == null) {
+                                StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
+                            } else {
+                                mTvTitle.setText(mCategory.getString(getContext()));
+                            }
 
-                    mCategoryItems = result;
-                    getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
-                    setUpRecycler(0);
-                    setLoadingStatus(false);
+                            mCategoryItems = result;
+                            getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
+                            setUpRecycler(0);
+                            setLoadingStatus(false);
+                        }
+
+                    });
                 }
-
-            });
+            }, 1500);
 
         } else {
             StatusMessage.show(getActivity(), getResources().getString(R.string.no_internet));
