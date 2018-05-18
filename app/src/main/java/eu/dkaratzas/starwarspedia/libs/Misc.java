@@ -91,4 +91,16 @@ public class Misc {
         byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
+
+    /**
+     * Returns a handy span count starting from 2 based on a preferred item width
+     *
+     * @param columnWidth      The preferred column width
+     * @param paddingLeftRight The padding that applies left of the first item and right of the last
+     * @return SpanCount
+     */
+    public static int getHandySpanCount(Context context, int columnWidth, int paddingLeftRight) {
+        int totalSpace = context.getResources().getDisplayMetrics().widthPixels - (paddingLeftRight * 2);
+        return (int) Math.max(2, (long) Math.ceil((double) totalSpace / columnWidth));
+    }
 }

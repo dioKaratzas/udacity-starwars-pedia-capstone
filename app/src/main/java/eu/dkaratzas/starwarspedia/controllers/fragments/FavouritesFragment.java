@@ -1,10 +1,16 @@
 package eu.dkaratzas.starwarspedia.controllers.fragments;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -17,14 +23,15 @@ import android.widget.TextView;
 import com.squareup.leakcanary.RefWatcher;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import eu.dkaratzas.starwarspedia.GlobalApplication;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.adapters.CategoryAdapter;
-import eu.dkaratzas.starwarspedia.api.ApolloManager;
-import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.api.SwapiCategory;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
@@ -35,17 +42,18 @@ import eu.dkaratzas.starwarspedia.libs.animations.techniques.PulseAnimator;
 import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideInUpAnimator;
 import eu.dkaratzas.starwarspedia.models.CategoryItems;
 import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
+import eu.dkaratzas.starwarspedia.provider.FavouriteItemsContract;
 import timber.log.Timber;
 
 /**
- * Displays the selected category's content of the SwapiModel API.
+ * Displays the selected category content of the SwapiModel API.
  * Activities that contain this fragment must implement the
- * {@link CategoryFragmentCallbacks} interface
+ * {@link FavouritesFragmentCallbacks} interface
  * to handle interaction events.
- * Use the {@link CategoryFragment#newInstance} factory method to
+ * Use the {@link FavouritesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CategoryFragment extends Fragment {
+public class FavouritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     @BindView(R.id.rvCategory)
     RecyclerView mRecyclerView;
     @BindView(R.id.avi)
@@ -56,16 +64,14 @@ public class CategoryFragment extends Fragment {
     TextView mTvTitle;
 
     public static final int LOADER_ID = 89;
-    public static final String BUNDLE_DATA_KEY = "categories_data";
+    public static final String BUNDLE_DATA_KEY = "favourites_data";
     public static final String BUNDLE_RECYCLER_POSITION = "recycler_position";
-    private static final String ARG_CATEGORY = "param_category";
 
-    private SwapiCategory mCategory;
-    private CategoryFragmentCallbacks mListener;
+    private FavouritesFragmentCallbacks mListener;
     private Unbinder mUnbinder;
-    private CategoryItems mCategoryItems;
+    private CategoryItems mFavouriteItems;
 
-    public CategoryFragment() {
+    public FavouritesFragment() {
         // Required empty public constructor
     }
 
@@ -73,49 +79,40 @@ public class CategoryFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param category SwapiCategory to fetch.
      * @return A new instance of fragment CategoryFragment.
      */
-    public static CategoryFragment newInstance(SwapiCategory category) {
-        CategoryFragment fragment = new CategoryFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_CATEGORY, category.ordinal());
-        fragment.setArguments(args);
-
-        return fragment;
+    public static FavouritesFragment newInstance() {
+        return new FavouritesFragment();
     }
 
     // region Fragment Lifecycle
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null && getArguments().containsKey(ARG_CATEGORY)) {
-            mCategory = SwapiCategory.values()[getArguments().getInt(ARG_CATEGORY)];
-        }
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_category, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
+
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_DATA_KEY)) {
-            mCategoryItems = savedInstanceState.getParcelable(BUNDLE_DATA_KEY);
+            mFavouriteItems = savedInstanceState.getParcelable(BUNDLE_DATA_KEY);
 
             int position = 0;
             if (savedInstanceState.containsKey(BUNDLE_RECYCLER_POSITION)) {
                 position = savedInstanceState.getInt(BUNDLE_RECYCLER_POSITION);
             }
 
-            mTvTitle.setText(mCategory.getString(getContext()));
+            mTvTitle.setText(getString(R.string.favourites));
             setUpRecycler(position);
         } else {
             setLoadingStatus(false);
-            loadData();
+
+            getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
         }
 
         mIvRefresh.setOnClickListener(new View.OnClickListener() {
@@ -125,6 +122,7 @@ public class CategoryFragment extends Fragment {
             }
         });
 
+
         return view;
     }
 
@@ -132,8 +130,8 @@ public class CategoryFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mCategoryItems != null) {
-            outState.putParcelable(BUNDLE_DATA_KEY, mCategoryItems);
+        if (mFavouriteItems != null) {
+            outState.putParcelable(BUNDLE_DATA_KEY, mFavouriteItems);
 
             if (mRecyclerView.getLayoutManager() != null && mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
                 int[] positions = ((StaggeredGridLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPositions(null);
@@ -146,8 +144,8 @@ public class CategoryFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof CategoryFragmentCallbacks) {
-            mListener = (CategoryFragmentCallbacks) context;
+        if (context instanceof FavouritesFragment.FavouritesFragmentCallbacks) {
+            mListener = (FavouritesFragment.FavouritesFragmentCallbacks) context;
         } else {
             throw new RuntimeException(context.toString() + " must implement OnCategoryClickedListener");
         }
@@ -176,41 +174,18 @@ public class CategoryFragment extends Fragment {
 
     // endregion
 
-    /**
-     * Load selected category items if there is an internet connection available
-     */
     private void loadData() {
-        if (Misc.isNetworkAvailable(getActivity().getApplicationContext())) {
-            setLoadingStatus(true);
-
-            ApolloManager.instance().fetchSwapiCategory(getActivity(), mCategory, getActivity().getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<CategoryItems>() {
-                @Override
-                public void onResponse(CategoryItems result) {
-                    if (result == null) {
-                        StatusMessage.show(getActivity(), getString(R.string.error_getting_data));
-                    } else {
-                        mTvTitle.setText(mCategory.getString(getContext()));
-                    }
-
-                    mCategoryItems = result;
-                    getActivity().getSupportLoaderManager().destroyLoader(LOADER_ID);
-                    setUpRecycler(0);
-                    setLoadingStatus(false);
-                }
-
-            });
-
-        } else {
-            StatusMessage.show(getActivity(), getResources().getString(R.string.no_internet));
-        }
 
     }
 
     private void setLoadingStatus(boolean loadingStatus) {
         // notify activity about the loadingStatus
-        mListener.onCategoryDataLoading(loadingStatus);
+        mListener.onFavouriteDataLoading(loadingStatus);
 
         if (loadingStatus) {
+            // hide status message if is visible
+//            hideStatus(0);
+
             // show loading indicator
             mAvi.smoothToShow();
         } else {
@@ -218,7 +193,7 @@ public class CategoryFragment extends Fragment {
             mAvi.hide();
         }
 
-        if (mCategoryItems == null && !loadingStatus)
+        if (mFavouriteItems == null && !loadingStatus)
             // if data failed to load show the refresh button
             YoYo.with(new FadeInAnimator())
                     .duration(300)
@@ -238,12 +213,12 @@ public class CategoryFragment extends Fragment {
 
     private void setUpRecycler(int scrollToPosition) {
 
-        if (mCategoryItems != null) {
+        if (mFavouriteItems != null) {
 
-            CategoryAdapter categoryAdapter = new CategoryAdapter(getContext(), mCategoryItems, new CategoryAdapter.OnItemClickListener() {
+            CategoryAdapter categoryAdapter = new CategoryAdapter(getContext(), mFavouriteItems, new CategoryAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(SimpleQueryData queryData) {
-                    mListener.onCategoryItemClicked(queryData);
+                    mListener.onFavouriteItemClicked(queryData);
                 }
             });
 
@@ -267,6 +242,96 @@ public class CategoryFragment extends Fragment {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        return new AsyncTaskLoader<Cursor>(getActivity()) {
+
+            // Initialize a Cursor, this will hold all the task data
+            Cursor mTaskData = null;
+
+            // onStartLoading() is called when a loader first starts loading data
+            @Override
+            protected void onStartLoading() {
+                if (mTaskData != null) {
+                    // Delivers any previously loaded data immediately
+                    deliverResult(mTaskData);
+                } else {
+                    // Force a new load
+                    forceLoad();
+                }
+            }
+
+            // loadInBackground() performs asynchronous loading of data
+            @Override
+            public Cursor loadInBackground() {
+                // Will implement to load data
+
+                // Query and load all task data in the background; sort by priority
+                // [Hint] use a try/catch block to catch any errors in loading data
+
+                try {
+                    return getActivity().getContentResolver().query(FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                            FavouriteItemsContract.FavouriteItemEntry._ID);
+
+                } catch (Exception e) {
+                    Timber.e("Failed to asynchronously load data.");
+                    Timber.e(e);
+                    return null;
+                }
+            }
+
+            // deliverResult sends the result of the load, a Cursor, to the registered listener
+            public void deliverResult(Cursor data) {
+                mTaskData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        if (data != null && data.getCount() > 0) {
+            mapDataAndSetRecycler(data);
+        } else {
+            StatusMessage.show(getActivity(), getString(R.string.no_favourites_message));
+        }
+
+        setLoadingStatus(false);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+
+    }
+
+    private void mapDataAndSetRecycler(Cursor cursor) {
+        List<SimpleQueryData> queryDataList = new ArrayList<>();
+
+        for (int i = 0; i < cursor.getCount(); i++) {
+            int swapiIdIndex = cursor.getColumnIndex(FavouriteItemsContract.FavouriteItemEntry.COLUMN_ID);
+            int titleIndex = cursor.getColumnIndex(FavouriteItemsContract.FavouriteItemEntry.COLUMN_TITLE);
+            int swapiCategoryIndex = cursor.getColumnIndex(FavouriteItemsContract.FavouriteItemEntry.COLUMN_CATEGORY);
+            int base64ImageIndex = cursor.getColumnIndex(FavouriteItemsContract.FavouriteItemEntry.COLUMN_IMAGE);
+
+            cursor.moveToPosition(i);
+            queryDataList.add(
+                    new SimpleQueryData(
+                            cursor.getString(swapiIdIndex),
+                            cursor.getString(titleIndex),
+                            SwapiCategory.values()[cursor.getInt(swapiCategoryIndex)],
+                            Misc.base64ToBitmap(cursor.getString(base64ImageIndex))
+                    ));
+        }
+        mFavouriteItems = new CategoryItems(queryDataList);
+
+        setUpRecycler(0);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -277,10 +342,10 @@ public class CategoryFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface CategoryFragmentCallbacks {
-        void onCategoryItemClicked(SimpleQueryData queryData);
+    public interface FavouritesFragmentCallbacks {
+        void onFavouriteItemClicked(SimpleQueryData queryData);
 
-        void onCategoryDataLoading(boolean loading);
+        void onFavouriteDataLoading(boolean loading);
     }
 
 }

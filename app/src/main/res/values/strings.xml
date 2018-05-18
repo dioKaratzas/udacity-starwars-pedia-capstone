@@ -11,6 +11,7 @@
     <string name="error_getting_data">\"To get star wars data from the server failed.\n\nHmmmmmmmm....\"</string>
     <string name="added_to_favourite">added to favourites</string>
     <string name="removed_from_favourite">removed from favourites</string>
+    <string name="no_favourites_message">No favorites, you have.</string>
 
 
     <!-- Images Content Descriptions-->
@@ -26,6 +27,7 @@
     <string name="vehicles">Vehicles</string>
     <string name="species">Species</string>
     <string name="planets">Planets</string>
+    <string name="favourites">Favourites</string>
 
 
     <!-- Models -->
