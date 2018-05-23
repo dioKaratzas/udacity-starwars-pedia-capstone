@@ -50,6 +50,8 @@
     <dimen name="related_to_item_margin">8dp</dimen>
 
     <!-- Favourites Widget -->
-    <dimen name="widget_margin">8dp</dimen>
+    <dimen name="widget_grid_view_column_width">90dp</dimen>
+    <dimen name="widget_grid_view_vertical_horizontal_spacing">10dp</dimen>
+    <dimen name="widget_item_image_height">110dp</dimen>
 
 </resources>

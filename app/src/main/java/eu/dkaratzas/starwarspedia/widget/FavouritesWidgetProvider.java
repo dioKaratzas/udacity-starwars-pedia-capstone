@@ -1,13 +1,11 @@
 package eu.dkaratzas.starwarspedia.widget;
 
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
@@ -25,7 +23,7 @@ public class FavouritesWidgetProvider extends AppWidgetProvider {
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_grid_view);
     }
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+    private void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         appWidgetManager.updateAppWidget(appWidgetId, getFavouritesGridRemoteView(context));
     }
 
@@ -35,32 +33,30 @@ public class FavouritesWidgetProvider extends AppWidgetProvider {
      * @param context The context
      * @return The RemoteViews for the GridView mode widget
      */
-    private static RemoteViews getFavouritesGridRemoteView(Context context) {
+    private RemoteViews getFavouritesGridRemoteView(Context context) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.favourites_widget_grid_view);
         // Set the GridWidgetService intent to act as the adapter for the GridView
         Intent intent = new Intent(context, GridWidgetService.class);
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
-        // Set the PlantDetailActivity intent to launch when clicked
+        // Set the MainActivity intent to launch when clicked
         Intent appIntent = new Intent(context, MainActivity.class);
         appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         views.setPendingIntentTemplate(R.id.widget_grid_view, appPendingIntent);
-        // Handle empty gardens
+        // Handle empty item
         views.setEmptyView(R.id.widget_grid_view, R.id.empty_view);
         return views;
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        //Start the intent service update widget action, the service takes care of updating the widgets UI
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager,
                                           int appWidgetId, Bundle newOptions) {

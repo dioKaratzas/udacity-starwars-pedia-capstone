@@ -358,6 +358,14 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
+    private void share() {
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " - " + mData.getTitle());
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, mTvDetails.getText());
+        startActivity(Intent.createChooser(sharingIntent, getString(R.string.share)));
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -367,6 +375,7 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.share_action:
+                share();
                 break;
             case R.id.favourite_action:
                 switchFavouriteStatus();

@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background">
@@ -7,12 +8,12 @@
         android:id="@+id/widget_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="90dp"
-        android:numColumns="auto_fit"
+        android:columnWidth="@dimen/widget_grid_view_column_width"
         android:gravity="center"
+        android:horizontalSpacing="@dimen/widget_grid_view_vertical_horizontal_spacing"
+        android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp" />
+        android:verticalSpacing="@dimen/widget_grid_view_vertical_horizontal_spacing" />
 
     <RelativeLayout
         android:id="@+id/empty_view"
@@ -24,17 +25,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/empty_view_text"
+            android:text="@string/empty_widget_view_text"
             android:textAlignment="center"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_x_large" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.2"
-            android:src="@drawable/ic_image_placeholder" />
+            android:src="@drawable/ic_image_placeholder"
+            tools:ignore="ContentDescription" />
 
     </RelativeLayout>
 </FrameLayout>

@@ -115,7 +115,8 @@ public class FavouritesFragment extends Fragment implements LoaderManager.Loader
         mIvRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadData();
+                setLoadingStatus(false);
+                getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, FavouritesFragment.this);
             }
         });
 
@@ -170,10 +171,6 @@ public class FavouritesFragment extends Fragment implements LoaderManager.Loader
     }
 
     // endregion
-
-    private void loadData() {
-
-    }
 
     private void setLoadingStatus(boolean loadingStatus) {
         // notify activity about the loadingStatus

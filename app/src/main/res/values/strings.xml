@@ -15,7 +15,7 @@
 
     <string name="share">Share</string>
     <string name="favourites">Favourites</string>
-
+    <string name="empty_widget_view_text">No favourite StarWarsPedia Data!</string>
 
     <!-- Images Content Descriptions-->
     <string name="image_thumbnail">Thumbnail</string>
@@ -75,8 +75,5 @@
     <string name="pilots">Pilots</string>
     <string name="consumables">Consumables</string>
 
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
-    <string name="empty_view_text">No favourites!</string>
 
 </resources>

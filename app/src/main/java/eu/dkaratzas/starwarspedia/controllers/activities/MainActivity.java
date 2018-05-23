@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mNavView.setNavigationItemSelectedListener(this);
 
         Bundle bundle = getIntent().getExtras();
+        // On widget item click
         if (bundle != null && bundle.containsKey(EXTRA_FAVOURITE_DATA)) {
             onItemClicked((SimpleQueryData) bundle.getParcelable(EXTRA_FAVOURITE_DATA), getString(R.string.favourites));
             mNavView.setCheckedItem(R.id.nav_favourites);

@@ -87,7 +87,7 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         views.setImageViewBitmap(R.id.widget_favourite_image, favouriteItemData.getImage());
         views.setTextViewText(R.id.widget_favourite_title, favouriteItemData.getTitle());
 
-        // Fill in the onClick PendingIntent Template using the specific plant Id for each item individually
+        // Fill in the onClick PendingIntent Template using the specific item Id for each item individually
         Bundle extras = new Bundle();
         extras.putParcelable(MainActivity.EXTRA_FAVOURITE_DATA, favouriteItemData);
         Intent fillInIntent = new Intent();
