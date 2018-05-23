@@ -49,4 +49,7 @@
     <dimen name="related_to_item_image_height">200dp</dimen>
     <dimen name="related_to_item_margin">8dp</dimen>
 
+    <!-- Favourites Widget -->
+    <dimen name="widget_margin">8dp</dimen>
+
 </resources>

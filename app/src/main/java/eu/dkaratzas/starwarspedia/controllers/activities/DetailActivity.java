@@ -50,6 +50,7 @@ import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.models.AllQueryData;
 import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 import eu.dkaratzas.starwarspedia.provider.FavouriteItemsContract;
+import eu.dkaratzas.starwarspedia.widget.FavouritesWidgetProvider;
 import timber.log.Timber;
 
 public class DetailActivity extends AppCompatActivity {
@@ -250,23 +251,28 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private Bitmap getBitmapFromImageView(ImageView imageView) {
-        BitmapDrawable bitmapDrawable = ((BitmapDrawable) imageView.getDrawable());
-        Bitmap bitmap;
-        if (bitmapDrawable == null) {
-            imageView.buildDrawingCache();
-            bitmap = imageView.getDrawingCache();
-            imageView.buildDrawingCache(false);
-        } else {
-            bitmap = bitmapDrawable.getBitmap();
-        }
+        try {
+            BitmapDrawable bitmapDrawable = ((BitmapDrawable) imageView.getDrawable());
+            Bitmap bitmap;
+            if (bitmapDrawable == null) {
+                imageView.buildDrawingCache();
+                bitmap = imageView.getDrawingCache();
+                imageView.buildDrawingCache(false);
+            } else {
+                bitmap = bitmapDrawable.getBitmap();
+            }
 
-        return bitmap;
+            return bitmap;
+        } catch (Exception ex) {
+            Timber.e(ex);
+            return null;
+        }
     }
 
     /**
      * Add or delete the item from favourites
      */
-    void switchFavouriteStatus() {
+    private void switchFavouriteStatus() {
 
         if (mThread != null && mThread.isAlive()) {
             return;
@@ -293,6 +299,7 @@ public class DetailActivity extends AppCompatActivity {
 
                             switchFavouriteDrawable();
                             StatusMessage.show(DetailActivity.this, mData.getTitle() + " " + getString(R.string.removed_from_favourite));
+                            FavouritesWidgetProvider.notifyWidgetDataChanged(getApplicationContext());
                         }
                     });
 
@@ -324,6 +331,7 @@ public class DetailActivity extends AppCompatActivity {
 
                                 switchFavouriteDrawable();
                                 StatusMessage.show(DetailActivity.this, mData.getTitle() + " " + getString(R.string.added_to_favourite));
+                                FavouritesWidgetProvider.notifyWidgetDataChanged(getApplicationContext());
 
                             } else {
                                 Timber.d("Uri null");

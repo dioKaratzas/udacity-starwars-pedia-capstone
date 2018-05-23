@@ -32,6 +32,7 @@ import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CategoryFragment.CategoryFragmentCallbacks, FavouritesFragment.FavouritesFragmentCallbacks {
 
+    public static final String EXTRA_FAVOURITE_DATA = "eu.dkaratzas.starwarspedia.extra.FAVOURITE_DATA";
     private static final int LOADER_ID = 90;
 
     @BindView(R.id.starView)
@@ -70,7 +71,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mNavView.setNavigationItemSelectedListener(this);
 
-        if (savedInstanceState == null) {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.containsKey(EXTRA_FAVOURITE_DATA)) {
+            onItemClicked((SimpleQueryData) bundle.getParcelable(EXTRA_FAVOURITE_DATA), getString(R.string.favourites));
+            mNavView.setCheckedItem(R.id.nav_favourites);
+            fetchAndShowFavourites();
+        } else if (savedInstanceState == null) {
             selectDefaultCategory();
         }
     }

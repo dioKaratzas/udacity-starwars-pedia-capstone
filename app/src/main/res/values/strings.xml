@@ -75,4 +75,8 @@
     <string name="pilots">Pilots</string>
     <string name="consumables">Consumables</string>
 
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="empty_view_text">No favourites!</string>
+
 </resources>
