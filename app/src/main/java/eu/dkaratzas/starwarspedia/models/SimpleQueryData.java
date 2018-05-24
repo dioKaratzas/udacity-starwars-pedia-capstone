@@ -1,5 +1,6 @@
 package eu.dkaratzas.starwarspedia.models;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,11 +13,20 @@ public class SimpleQueryData implements Parcelable {
     private String id;
     private String title;
     private SwapiCategory category;
+    private Bitmap image;
 
     public SimpleQueryData(String id, String title, SwapiCategory category) {
         this.id = id;
         this.title = title;
         this.category = category;
+        this.image = null;
+    }
+
+    public SimpleQueryData(String id, String title, SwapiCategory category, Bitmap image) {
+        this.id = id;
+        this.title = title;
+        this.category = category;
+        this.image = image;
     }
 
     public String getId() {
@@ -50,6 +60,10 @@ public class SimpleQueryData implements Parcelable {
                 return storageRef.child("vehicles/" + imageName + ".jpg");
         }
         return null;
+    }
+
+    public Bitmap getImage() {
+        return image;
     }
 
     // region Parcelable

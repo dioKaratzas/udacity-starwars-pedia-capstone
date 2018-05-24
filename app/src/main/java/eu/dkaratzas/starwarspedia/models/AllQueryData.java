@@ -329,7 +329,7 @@ public class AllQueryData implements Parcelable {
         if (vehicle != null) {
             this.id = getSafeString(vehicle.id());
             this.title = getSafeString(vehicle.name());
-            this.category = SwapiCategory.STARSHIP;
+            this.category = SwapiCategory.VEHICLE;
             this.detailsMap = new LinkedHashMap<>();
             this.relatedItems = new LinkedHashMap<>();
 

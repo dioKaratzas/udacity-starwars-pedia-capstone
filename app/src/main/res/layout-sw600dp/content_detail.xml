@@ -64,7 +64,6 @@
                         android:id="@+id/tvTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/title_text_left_margin"
                         android:layout_marginStart="@dimen/title_text_left_margin"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/text_xx_large"

@@ -62,6 +62,10 @@ public class CategoryItems implements Parcelable {
 
     }
 
+    public CategoryItems(List<SimpleQueryData> queryDataList) {
+        this.queryDataList = queryDataList;
+    }
+
     public List<SimpleQueryData> getQueryDataList() {
         return queryDataList;
     }

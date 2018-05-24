@@ -1,7 +1,14 @@
 package eu.dkaratzas.starwarspedia.controllers.activities;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
@@ -10,16 +17,21 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.TypedValue;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,10 +44,13 @@ import eu.dkaratzas.starwarspedia.adapters.RelatedToAdapter;
 import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
 import eu.dkaratzas.starwarspedia.libs.GlideApp;
+import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.SpacingItemDecoration;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import eu.dkaratzas.starwarspedia.models.AllQueryData;
 import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
+import eu.dkaratzas.starwarspedia.provider.FavouriteItemsContract;
+import eu.dkaratzas.starwarspedia.widget.FavouritesWidgetProvider;
 import timber.log.Timber;
 
 public class DetailActivity extends AppCompatActivity {
@@ -46,6 +61,9 @@ public class DetailActivity extends AppCompatActivity {
 
     private AllQueryData mData;
     private String mCurrentCategoryTitle;
+    private boolean mIsFavourite = false;
+    private Menu mMenu;
+    private Thread mThread;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -74,10 +92,32 @@ public class DetailActivity extends AppCompatActivity {
             setSupportActionBar(mToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-            publishUI();
+            mIsFavourite = isFavouriteItem();
 
+            // Wait till image get load
+            supportPostponeEnterTransition();
+
+            publishUI();
         } else {
             throw new IllegalArgumentException("Must provide an AllQueryData and Category's Fragment current category as intent extras to display it's data and set the toolbars title.");
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.mMenu = menu;
+        getMenuInflater().inflate(R.menu.activity_details_menu, menu);
+        switchFavouriteDrawable();
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mThread != null) {
+            mThread.interrupt();
+            mThread = null;
         }
     }
 
@@ -92,6 +132,19 @@ public class DetailActivity extends AppCompatActivity {
                 .error(R.drawable.ic_image_placeholder)
                 .apply(requestOptions)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        supportStartPostponedEnterTransition();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        supportStartPostponedEnterTransition();
+                        return false;
+                    }
+                })
                 .into(mIvThumb);
 
         // Get item details to display
@@ -186,15 +239,151 @@ public class DetailActivity extends AppCompatActivity {
         mLinearContainer.addView(view);
     }
 
+    private boolean isFavouriteItem() {
+
+        final Cursor cursor;
+        cursor = getApplicationContext().getContentResolver().query(FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI, null, "swapi_id=?", new String[]{String.valueOf(mData.getId())}, null);
+
+        boolean result = cursor.getCount() > 0;
+        cursor.close();
+
+        return result;
+    }
+
+    private Bitmap getBitmapFromImageView(ImageView imageView) {
+        try {
+            BitmapDrawable bitmapDrawable = ((BitmapDrawable) imageView.getDrawable());
+            Bitmap bitmap;
+            if (bitmapDrawable == null) {
+                imageView.buildDrawingCache();
+                bitmap = imageView.getDrawingCache();
+                imageView.buildDrawingCache(false);
+            } else {
+                bitmap = bitmapDrawable.getBitmap();
+            }
+
+            return bitmap;
+        } catch (Exception ex) {
+            Timber.e(ex);
+            return null;
+        }
+    }
+
+    /**
+     * Add or delete the item from favourites
+     */
+    private void switchFavouriteStatus() {
+
+        if (mThread != null && mThread.isAlive()) {
+            return;
+        }
+        mMenu.getItem(0).setEnabled(false);
+
+        if (mIsFavourite) {
+
+            mThread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    Uri uri = FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI;
+                    uri = uri.buildUpon().appendPath(String.valueOf(mData.getId())).build();
+                    int returnUri = getApplicationContext().getContentResolver().delete(uri, null, null);
+                    Timber.d("ReturnUri: %s", returnUri);
+
+                    getApplicationContext().getContentResolver().notifyChange(uri, null);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mIsFavourite = !mIsFavourite;
+
+                            switchFavouriteDrawable();
+                            StatusMessage.show(DetailActivity.this, mData.getTitle() + " " + getString(R.string.removed_from_favourite));
+                            FavouritesWidgetProvider.notifyWidgetDataChanged(getApplicationContext());
+                        }
+                    });
+
+                }
+            });
+
+            mThread.start();
+
+        } else {
+
+            mThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final ContentValues contentValues = new ContentValues();
+                    contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_ID, mData.getId());
+                    contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_TITLE, mData.getTitle());
+                    contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_CATEGORY, mData.getCategory().ordinal());
+
+                    String imageBase64 = Misc.bitmapToBase64(getBitmapFromImageView(mIvThumb));
+                    contentValues.put(FavouriteItemsContract.FavouriteItemEntry.COLUMN_IMAGE, imageBase64);
+
+                    final Uri uri = getApplicationContext().getContentResolver().insert(FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI, contentValues);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (uri != null) {
+                                mIsFavourite = !mIsFavourite;
+
+                                switchFavouriteDrawable();
+                                StatusMessage.show(DetailActivity.this, mData.getTitle() + " " + getString(R.string.added_to_favourite));
+                                FavouritesWidgetProvider.notifyWidgetDataChanged(getApplicationContext());
+
+                            } else {
+                                Timber.d("Uri null");
+                            }
+                        }
+                    });
+
+                }
+            });
+
+            mThread.start();
+
+        }
+    }
+
+    private void switchFavouriteDrawable() {
+        mMenu.getItem(0).setEnabled(true);
+
+        if (mIsFavourite) {
+            mMenu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_unfavourite));
+        } else {
+            mMenu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_favourite));
+        }
+
+    }
+
+    private void share() {
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " - " + mData.getTitle());
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, mTvDetails.getText());
+        startActivity(Intent.createChooser(sharingIntent, getString(R.string.share)));
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            getSupportLoaderManager().destroyLoader(LOADER_ID);
-            finish();
-            return true;
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getSupportLoaderManager().destroyLoader(LOADER_ID);
+                finish();
+                return true;
+            case R.id.share_action:
+                share();
+                break;
+            case R.id.favourite_action:
+                switchFavouriteStatus();
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
+
     }
 
     @Override
