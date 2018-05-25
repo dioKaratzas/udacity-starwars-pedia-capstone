@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp">
@@ -11,7 +12,7 @@
         android:layout_height="@dimen/widget_item_image_height"
         android:contentDescription="@string/image_thumbnail"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_image_placeholder" />
+        app:srcCompat="@drawable/ic_image_placeholder" />
 
     <TextView
         android:id="@+id/widget_favourite_title"

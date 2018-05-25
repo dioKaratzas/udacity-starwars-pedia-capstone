@@ -299,7 +299,7 @@ public class DetailActivity extends AppCompatActivity {
 
                             switchFavouriteDrawable();
                             StatusMessage.show(DetailActivity.this, mData.getTitle() + " " + getString(R.string.removed_from_favourite));
-                            FavouritesWidgetProvider.notifyWidgetDataChanged(getApplicationContext());
+                            FavouritesWidgetProvider.sendRefreshBroadcast(getApplicationContext());
                         }
                     });
 
@@ -331,7 +331,7 @@ public class DetailActivity extends AppCompatActivity {
 
                                 switchFavouriteDrawable();
                                 StatusMessage.show(DetailActivity.this, mData.getTitle() + " " + getString(R.string.added_to_favourite));
-                                FavouritesWidgetProvider.notifyWidgetDataChanged(getApplicationContext());
+                                FavouritesWidgetProvider.sendRefreshBroadcast(getApplicationContext());
 
                             } else {
                                 Timber.d("Uri null");

@@ -3,6 +3,7 @@ package eu.dkaratzas.starwarspedia.widget;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Binder;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -13,11 +14,13 @@ import eu.dkaratzas.starwarspedia.controllers.activities.MainActivity;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.models.SimpleQueryData;
 import eu.dkaratzas.starwarspedia.provider.FavouriteItemsContract;
+import timber.log.Timber;
 
 
 public class GridWidgetService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
+        Timber.d("onGetViewFactory");
         return new GridRemoteViewsFactory(this.getApplicationContext());
     }
 }
@@ -29,7 +32,6 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     public GridRemoteViewsFactory(Context applicationContext) {
         mContext = applicationContext;
-
     }
 
     @Override
@@ -40,24 +42,33 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     //called on start and when notifyAppWidgetViewDataChanged is called
     @Override
     public void onDataSetChanged() {
+        Timber.d("onDataSetChanged");
         // get all favourite items
-        if (mCursor != null) mCursor.close();
+        if (mCursor != null) {
+            mCursor.close();
+        }
+
+        final long identityToken = Binder.clearCallingIdentity();
+
         mCursor = mContext.getContentResolver().query(FavouriteItemsContract.FavouriteItemEntry.CONTENT_URI,
                 null,
                 null,
                 null,
                 FavouriteItemsContract.FavouriteItemEntry._ID);
+
+        Binder.restoreCallingIdentity(identityToken);
     }
 
     @Override
     public void onDestroy() {
-        mCursor.close();
+        if (mCursor != null) {
+            mCursor.close();
+        }
     }
 
     @Override
     public int getCount() {
-        if (mCursor == null) return 0;
-        return mCursor.getCount();
+        return mCursor == null ? 0 : mCursor.getCount();
     }
 
     /**
@@ -68,6 +79,7 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
      */
     @Override
     public RemoteViews getViewAt(int position) {
+        Timber.d("getViewAt");
         if (mCursor == null || mCursor.getCount() == 0) return null;
         mCursor.moveToPosition(position);
         int swapiIdIndex = mCursor.getColumnIndex(FavouriteItemsContract.FavouriteItemEntry.COLUMN_ID);
