@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.leakcanary.RefWatcher;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -255,6 +256,7 @@ public class FavouritesFragment extends Fragment implements LoaderManager.Loader
                 } catch (Exception e) {
                     Timber.e("Failed to asynchronously load data.");
                     Timber.e(e);
+                    Crashlytics.logException(e);
                     return null;
                 }
             }

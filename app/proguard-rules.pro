@@ -42,6 +42,16 @@
 -keep class com.wang.avi.** { *; }
 -keep class com.wang.avi.indicators.** { *; }
 
+# --------- Crashlytics ----------
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+
+# If you are using custom exceptions, add this line so that custom exception types are skipped during obfuscation:
+-keep public class * extends java.lang.Exception
+
+# For Fabric to properly de-obfuscate your crash reports, you need to remove this line from your ProGuard config:
+-printmapping mapping.txt
+
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn javax.annotation.**

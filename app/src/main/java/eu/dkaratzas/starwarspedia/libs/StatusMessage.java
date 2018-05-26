@@ -16,7 +16,7 @@ import eu.dkaratzas.starwarspedia.libs.animations.techniques.SlideOutDownAnimato
 import timber.log.Timber;
 
 public class StatusMessage {
-    private static volatile StatusMessage sharedInstance;
+    private static volatile WeakReference<StatusMessage> sharedInstance;
 
     private static final int ANIMATION_DURATION = 300;
     private static int HIDE_DELAY = 5000;
@@ -30,26 +30,28 @@ public class StatusMessage {
     }
 
     public static void show(Activity activity, String message) {
-        if (sharedInstance == null) {
+        if (sharedInstance == null || sharedInstance.get() == null) {
             synchronized (StatusMessage.class) {
-                if (sharedInstance == null) sharedInstance = new StatusMessage();
+                sharedInstance = new WeakReference<>(new StatusMessage());
+
             }
         }
-        sharedInstance.showMessage(activity, message, true);
+        sharedInstance.get().showMessage(activity, message, true);
     }
 
     public static void show(Activity activity, String message, boolean dismissible) {
-        if (sharedInstance == null) {
+        if (sharedInstance == null || sharedInstance.get() == null) {
             synchronized (StatusMessage.class) {
-                if (sharedInstance == null) sharedInstance = new StatusMessage();
+                sharedInstance = new WeakReference<>(new StatusMessage());
+
             }
         }
-        sharedInstance.showMessage(activity, message, dismissible);
+        sharedInstance.get().showMessage(activity, message, dismissible);
     }
 
     public static void hide() {
-        if (sharedInstance != null) {
-            sharedInstance.hideMessage();
+        if (sharedInstance != null && sharedInstance.get() != null) {
+            sharedInstance.get().hideMessage();
         }
     }
 

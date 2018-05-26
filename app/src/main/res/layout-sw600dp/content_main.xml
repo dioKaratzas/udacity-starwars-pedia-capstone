@@ -41,5 +41,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_menu" />
 
+    <FrameLayout
+        android:id="@+id/ads_container"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ads_container_height"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+    </FrameLayout>
 </android.support.constraint.ConstraintLayout>
 

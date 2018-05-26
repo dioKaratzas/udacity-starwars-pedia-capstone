@@ -9,9 +9,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +20,7 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -53,7 +54,7 @@ import eu.dkaratzas.starwarspedia.provider.FavouriteItemsContract;
 import eu.dkaratzas.starwarspedia.widget.FavouritesWidgetProvider;
 import timber.log.Timber;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends BaseActivity {
 
     public static final String EXTRA_DATA_TO_DISPLAY = "extra_data";
     public static final String EXTRA_CURRENT_CATEGORY_TITLE = "extra_title";
@@ -77,12 +78,16 @@ public class DetailActivity extends AppCompatActivity {
     LinearLayout mLinearContainer;
     @BindView(R.id.scrollView)
     NestedScrollView mScrollView;
+    @BindView(R.id.fabPremium)
+    FloatingActionButton mFabPremium;
 
+    // region Activity Lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
+
+        super.onCreate(savedInstanceState);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey(EXTRA_DATA_TO_DISPLAY) && bundle.containsKey(EXTRA_CURRENT_CATEGORY_TITLE)) {
@@ -93,6 +98,13 @@ public class DetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             mIsFavourite = isFavouriteItem();
+            mFabPremium.setVisibility(globalApplication.isDisplayAds() ? View.VISIBLE : View.GONE);
+            mFabPremium.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showPurchaseDialog();
+                }
+            });
 
             // Wait till image get load
             supportPostponeEnterTransition();
@@ -104,11 +116,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        this.mMenu = menu;
-        getMenuInflater().inflate(R.menu.activity_details_menu, menu);
-        switchFavouriteDrawable();
-        return super.onCreateOptionsMenu(menu);
+    FrameLayout getAdsContainer() {
+        return findViewById(R.id.ads_container);
     }
 
     @Override
@@ -119,6 +128,41 @@ public class DetailActivity extends AppCompatActivity {
             mThread.interrupt();
             mThread = null;
         }
+    }
+    // endregion
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.mMenu = menu;
+        getMenuInflater().inflate(R.menu.activity_details_menu, menu);
+        switchFavouriteDrawable();
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getSupportLoaderManager().destroyLoader(LOADER_ID);
+                finish();
+                return true;
+            case R.id.share_action:
+                share();
+                break;
+            case R.id.favourite_action:
+                switchFavouriteStatus();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        getSupportLoaderManager().destroyLoader(LOADER_ID);
+        super.onBackPressed();
     }
 
     private void publishUI() {
@@ -265,6 +309,7 @@ public class DetailActivity extends AppCompatActivity {
             return bitmap;
         } catch (Exception ex) {
             Timber.e(ex);
+
             return null;
         }
     }
@@ -367,28 +412,14 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getSupportLoaderManager().destroyLoader(LOADER_ID);
-                finish();
-                return true;
-            case R.id.share_action:
-                share();
-                break;
-            case R.id.favourite_action:
-                switchFavouriteStatus();
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-
+    public void onSetUpAds() {
+        super.onSetUpAds();
+        mFabPremium.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onBackPressed() {
-        getSupportLoaderManager().destroyLoader(LOADER_ID);
-        super.onBackPressed();
+    public void onRemoveAds() {
+        super.onRemoveAds();
+        mFabPremium.setVisibility(View.GONE);
     }
 }

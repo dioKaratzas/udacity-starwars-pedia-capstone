@@ -12,6 +12,7 @@ import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.response.CustomTypeAdapter;
 import com.apollographql.apollo.response.CustomTypeValue;
+import com.crashlytics.android.Crashlytics;
 
 import java.io.Serializable;
 import java.security.KeyStore;
@@ -67,6 +68,7 @@ public class ApolloManager implements Serializable {
             throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
         }
 
+        // Custom DateTime Scalar Type
         CustomTypeAdapter dateCustomTypeAdapter = new CustomTypeAdapter<Date>() {
             @Override
             public Date decode(CustomTypeValue value) {
@@ -105,6 +107,15 @@ public class ApolloManager implements Serializable {
         return sharedInstance;
     }
 
+    /**
+     * Fetch a SWAPI category from the server using {@link ApolloLoader}
+     *
+     * @param context       The Context to provide to the ApolloLoader.
+     * @param swapiCategory The {@link SwapiCategory} to fetch from the server
+     * @param loaderManager The LoaderManager instance.
+     * @param loaderId      The unique identifier to be used for the ApolloLoader.
+     * @param apiCallback   The Loader callback.
+     */
     public void fetchSwapiCategory(Context context, SwapiCategory swapiCategory, LoaderManager loaderManager, int loaderId, final StarWarsApiCallback<CategoryItems> apiCallback) {
 
         ApolloLoader.load(context, loaderManager, loaderId, getApolloCallForCategory(swapiCategory), new ApolloCall.Callback() {
@@ -115,33 +126,52 @@ public class ApolloManager implements Serializable {
 
             @Override
             public void onFailure(@Nonnull ApolloException e) {
-                Timber.e(e);
                 apiCallback.onResponse(null);
+
+                Timber.e(e);
+                Crashlytics.logException(e);
             }
         });
 
     }
 
+    /**
+     * Fetch a SWAPI item from the server using {@link ApolloLoader}
+     *
+     * @param context       The Context to provide to the ApolloLoader.
+     * @param swapiCategory The {@link SwapiCategory} where the item belong, to fetch from the server
+     * @param loaderManager The LoaderManager instance.
+     * @param loaderId      The unique identifier to be used for the ApolloLoader.
+     * @param apiCallback   The Loader callback.
+     */
     public void fetchSwapiItem(final Context context, String id, SwapiCategory swapiCategory, LoaderManager loaderManager, int loaderId, final StarWarsApiCallback<AllQueryData> apiCallback) {
 
-        ApolloLoader.load(context, loaderManager, loaderId, getApolloCallForItemOnCategoryById(id, swapiCategory), new ApolloCall.Callback() {
-            @Override
-            public void onResponse(@Nonnull Response response) {
-                AllQueryData responseData = new AllQueryData(response, context);
-                if (responseData.getCategory() == null) // Responce.Data.Model was null
-                    responseData = null;
+        ApolloLoader.load(context, loaderManager, loaderId, getApolloCallForItemOnCategoryById(id, swapiCategory),
+                new ApolloCall.Callback() {
+                    @Override
+                    public void onResponse(@Nonnull Response response) {
+                        AllQueryData responseData = new AllQueryData(response, context);
+                        if (responseData.getCategory() == null) // Responce.Data.Model was null
+                            responseData = null;
 
-                apiCallback.onResponse(responseData);
-            }
+                        apiCallback.onResponse(responseData);
+                    }
 
-            @Override
-            public void onFailure(@Nonnull ApolloException e) {
-                Timber.e(e);
-                apiCallback.onResponse(null);
-            }
-        });
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e) {
+                        apiCallback.onResponse(null);
+
+                        Timber.e(e);
+                        Crashlytics.logException(e);
+                    }
+                });
     }
 
+    /**
+     * @param id            The id of the item to fetch
+     * @param swapiCategory The {@link SwapiCategory} where the item belong
+     * @return {@link ApolloCall} that will be used by the Loader to async execute the request
+     */
     private ApolloCall getApolloCallForItemOnCategoryById(String id, SwapiCategory swapiCategory) {
         switch (swapiCategory) {
             case FILM:
@@ -161,6 +191,10 @@ public class ApolloManager implements Serializable {
         return null;
     }
 
+    /**
+     * @param swapiCategory The {@link SwapiCategory} to return the corresponding {@link ApolloCall}
+     * @return {@link ApolloCall} that will be used by the Loader to async execute the request
+     */
     private ApolloCall getApolloCallForCategory(SwapiCategory swapiCategory) {
         switch (swapiCategory) {
             case FILM:
@@ -199,6 +233,7 @@ public class ApolloManager implements Serializable {
                 client.connectionSpecs(specs);
             } catch (Exception ex) {
                 Timber.e(ex, "Error while setting TLS 1.2");
+                Crashlytics.logException(ex);
             }
         }
 
@@ -213,6 +248,8 @@ public class ApolloManager implements Serializable {
             return (X509TrustManager) trustManagers[0];
         } catch (NoSuchAlgorithmException | KeyStoreException exception) {
             Timber.e(exception, "Not trust manager available");
+
+            Crashlytics.logException(exception);
         }
 
         return null;

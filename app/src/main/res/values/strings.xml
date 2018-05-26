@@ -16,6 +16,14 @@
     <string name="share">Share</string>
     <string name="favourites">Favourites</string>
     <string name="empty_widget_view_text">No favourite StarWarsPedia Data!</string>
+    <string name="inapp_billing_not_available">In-app billing service is unavailable. Please upgrade Google Play to version >= 3.9.16.</string>
+    <string name="unexpected_error">An unexpected error occurred. Please try again later.</string>
+
+    <string name="remove_ads">Remove Ads</string>
+    <string name="buy_premium">Buy Premium</string>
+    <string name="buy_premium_description">You can get Premium with a purchase within the app. If you have already paid but reinstalled the app, click the button and the premium features will be recovered.</string>
+    <string name="thank_you">Thank you so much for your contribution.</string>
+    <string name="lets_go">Let\'s go!</string>
 
     <!-- Images Content Descriptions-->
     <string name="image_thumbnail">Thumbnail</string>
