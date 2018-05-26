@@ -53,7 +53,7 @@ public class GlobalApplication extends Application implements BillingProcessor.I
             Timber.plant(new Timber.DebugTree());
         }
 
-        if (BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             if (billingProcessor == null) {
                 if (!BillingProcessor.isIabServiceAvailable(this)) {
                     Toast.makeText(this, getString(R.string.inapp_billing_not_available), Toast.LENGTH_LONG).show();
