@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#212121</color>
     <color name="colorAccent">#f1e000</color>
     <color name="widgetBackgroundColor">#f0212121</color>
+    <color name="loadingLayoutBackColor">#b40f0f0f</color>
 </resources>

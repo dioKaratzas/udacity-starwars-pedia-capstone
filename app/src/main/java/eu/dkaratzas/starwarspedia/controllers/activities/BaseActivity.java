@@ -18,12 +18,13 @@ import com.google.android.gms.ads.AdView;
 
 import eu.dkaratzas.starwarspedia.Constants;
 import eu.dkaratzas.starwarspedia.GlobalApplication;
+import eu.dkaratzas.starwarspedia.InAppBillingManager;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.libs.Misc;
 import eu.dkaratzas.starwarspedia.libs.StatusMessage;
 import timber.log.Timber;
 
-public abstract class BaseActivity extends AppCompatActivity implements GlobalApplication.AdListener {
+public abstract class BaseActivity extends AppCompatActivity implements InAppBillingManager.AdListener {
     private FrameLayout mAdsContainer;
     protected GlobalApplication globalApplication;
     private AdView mAdView;
@@ -36,7 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity implements GlobalAp
         super.onCreate(savedInstanceState);
 
         globalApplication = (GlobalApplication) getApplicationContext();
-        globalApplication.addToListeners(this);
+        InAppBillingManager.addToListeners(this);
     }
 
     @Override
@@ -49,19 +50,20 @@ public abstract class BaseActivity extends AppCompatActivity implements GlobalAp
             premiumDescAlert = null;
         }
 
-        globalApplication.removeFromListeners(this);
+        InAppBillingManager.removeFromListeners(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (globalApplication.getBillingProcessor() != null && !globalApplication.getBillingProcessor().handleActivityResult(requestCode, resultCode, data)) {
+        if (InAppBillingManager.getBillingProcessor() != null &&
+                !InAppBillingManager.getBillingProcessor().handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     @Override
     public void onSetUpAds() {
-        if (globalApplication.isDisplayAds()) {
+        if (InAppBillingManager.isDisplayAds()) {
             mAdsContainer = getAdsContainer();
 
             if (mAdsContainer != null && mAdView == null) {
@@ -71,7 +73,7 @@ public abstract class BaseActivity extends AppCompatActivity implements GlobalAp
                 int height = Misc.pxToDp((int) getResources().getDimension(R.dimen.ads_container_height)); // or whatever is appropriate - make sure its >= ad minimum
                 // set the size to the width of the screen
                 mAdView.setAdSize(new AdSize(AdSize.FULL_WIDTH, height));
-                mAdView.setAdUnitId(Constants.NATIVE_AD_ID);
+                mAdView.setAdUnitId(Constants.NATIVE_AD_ID());
 
                 FrameLayout.LayoutParams lp = new
                         FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
@@ -110,7 +112,7 @@ public abstract class BaseActivity extends AppCompatActivity implements GlobalAp
     }
 
     protected void showPurchaseDialog() {
-        if (!globalApplication.isReadyToPurchase()) {
+        if (!InAppBillingManager.isReadyToPurchase()) {
 
             StatusMessage.show(this, getString(R.string.inapp_billing_not_available), true);
 
@@ -119,11 +121,11 @@ public abstract class BaseActivity extends AppCompatActivity implements GlobalAp
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             final Activity activity = this;
 
-            builder.setTitle(getString(R.string.buy_premium))
-                    .setMessage(getString(R.string.buy_premium_description))
+            builder.setTitle(getString(R.string.remove_ads))
+                    .setMessage(getString(R.string.remove_ads_description))
                     .setPositiveButton(getString(R.string.lets_go), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            globalApplication.getBillingProcessor().purchase(activity, Constants.PREMIUM_PRODUCT_ID);
+                            InAppBillingManager.getBillingProcessor().purchase(activity, Constants.PREMIUM_PRODUCT_ID());
                         }
                     });
 

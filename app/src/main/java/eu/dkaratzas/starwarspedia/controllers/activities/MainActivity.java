@@ -1,5 +1,6 @@
 package eu.dkaratzas.starwarspedia.controllers.activities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import eu.dkaratzas.starsgl.widget.StarView;
 import eu.dkaratzas.starwarspedia.GlobalApplication;
+import eu.dkaratzas.starwarspedia.InAppBillingManager;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.api.ApolloManager;
 import eu.dkaratzas.starwarspedia.api.StarWarsApiCallback;
@@ -51,6 +53,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private int mSelectedItemId;
     private boolean mOnFavouriteCategory;
+    private Dialog loadingDialog;
 
     // region Activity Lifecycle
     @Override
@@ -72,7 +75,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         });
 
         mNavView.setNavigationItemSelectedListener(this);
-        mNavView.getMenu().findItem(R.id.nav_premium).setVisible(globalApplication.isDisplayAds());
+        mNavView.getMenu().findItem(R.id.nav_premium).setVisible(InAppBillingManager.isDisplayAds());
 
         Bundle bundle = getIntent().getExtras();
 
@@ -110,6 +113,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onDestroy() {
         RefWatcher refWatcher = GlobalApplication.getRefWatcher(this);
         refWatcher.watch(this);
+
+        hideLoadingDialog();
 
         super.onDestroy();
     }
@@ -166,6 +171,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onSetUpAds() {
+        super.onSetUpAds();
+
+        mNavView.getMenu().findItem(R.id.nav_premium).setVisible(true);
+    }
+
+    @Override
+    public void onRemoveAds() {
+        super.onRemoveAds();
+
+        mNavView.getMenu().findItem(R.id.nav_premium).setVisible(false);
     }
 
     // region Fragment Callbacks
@@ -251,10 +270,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         getSupportLoaderManager().destroyLoader(LOADER_ID);
         if (Misc.isNetworkAvailable(getApplicationContext())) {
             if (queryData != null) {
+
+                showLoadingDialog();
+
                 ApolloManager.instance().fetchSwapiItem(this, queryData.getId(), queryData.getCategory(), getSupportLoaderManager(), LOADER_ID, new StarWarsApiCallback<AllQueryData>() {
                     @Override
                     public void onResponse(AllQueryData result) {
                         getSupportLoaderManager().destroyLoader(LOADER_ID);
+                        hideLoadingDialog();
 
                         if (result == null) {
                             StatusMessage.show(MainActivity.this, getString(R.string.error_getting_data));
@@ -275,20 +298,22 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
+    private void showLoadingDialog() {
+        hideLoadingDialog();
+
+        loadingDialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
+        loadingDialog.setContentView(R.layout.loading_layout);
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+    }
+
+    private void hideLoadingDialog() {
+        if (loadingDialog != null) {
+            loadingDialog.dismiss();
+            loadingDialog = null;
+        }
+    }
+
     // endregion
 
-
-    @Override
-    public void onSetUpAds() {
-        super.onSetUpAds();
-
-        mNavView.getMenu().findItem(R.id.nav_premium).setVisible(true);
-    }
-
-    @Override
-    public void onRemoveAds() {
-        super.onRemoveAds();
-
-        mNavView.getMenu().findItem(R.id.nav_premium).setVisible(false);
-    }
 }

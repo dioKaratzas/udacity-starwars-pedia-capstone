@@ -40,6 +40,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import eu.dkaratzas.starwarspedia.InAppBillingManager;
 import eu.dkaratzas.starwarspedia.R;
 import eu.dkaratzas.starwarspedia.adapters.RelatedToAdapter;
 import eu.dkaratzas.starwarspedia.api.ApolloManager;
@@ -98,7 +99,7 @@ public class DetailActivity extends BaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             mIsFavourite = isFavouriteItem();
-            mFabPremium.setVisibility(globalApplication.isDisplayAds() ? View.VISIBLE : View.GONE);
+            mFabPremium.setVisibility(InAppBillingManager.isDisplayAds() ? View.VISIBLE : View.GONE);
             mFabPremium.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -163,6 +164,18 @@ public class DetailActivity extends BaseActivity {
     public void onBackPressed() {
         getSupportLoaderManager().destroyLoader(LOADER_ID);
         super.onBackPressed();
+    }
+
+    @Override
+    public void onSetUpAds() {
+        super.onSetUpAds();
+        mFabPremium.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onRemoveAds() {
+        super.onRemoveAds();
+        mFabPremium.setVisibility(View.GONE);
     }
 
     private void publishUI() {
@@ -411,15 +424,4 @@ public class DetailActivity extends BaseActivity {
         startActivity(Intent.createChooser(sharingIntent, getString(R.string.share)));
     }
 
-    @Override
-    public void onSetUpAds() {
-        super.onSetUpAds();
-        mFabPremium.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onRemoveAds() {
-        super.onRemoveAds();
-        mFabPremium.setVisibility(View.GONE);
-    }
 }
