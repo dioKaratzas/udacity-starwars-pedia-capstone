@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     AppBarLayout mAppBar;
 
     private int mSelectedItemId;
+    private boolean mOnFavouriteCategory;
 
     // region Activity Lifecycle
     @Override
@@ -86,6 +87,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 selectDefaultCategory();
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        // If we return back from details activity reload the favourites category
+        // because the item might removed or added on the favourites list
+        if (mOnFavouriteCategory)
+            switchToFavouritesCategory();
     }
 
     @Override
@@ -186,6 +198,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     // region Methods
     private void switchToCategory(final SwapiCategory category) {
+        mOnFavouriteCategory = false;
 
         // if we are on small screen devices and AppBarLayout exists expand it
         if (mAppBar != null)
@@ -201,6 +214,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     private void switchToFavouritesCategory() {
+        mOnFavouriteCategory = true;
 
         // if we are on small screen devices and AppBarLayout exists expand it
         if (mAppBar != null)
