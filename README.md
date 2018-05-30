@@ -14,6 +14,21 @@ StarWars Pedia allows users to search a huge amount of information on all sorts 
 
 The app is published on PlayStore: [https://play.google.com/store/apps/details?id=eu.dkaratzas.starwarspedia](https://play.google.com/store/apps/details?id=eu.dkaratzas.starwarspedia)
 
+
+## The review of my work
+https://review.udacity.com/#!/reviews/1244639
+
+```
+Meets Specifications
+
+You've nailed it! StarWars Pedia looks cool, works smoothly and serves its purpose well.
+...
+Congratulations! 🏆
+```
+
+and this is what i've earned!
+![screen](../master/art/DionysiosKaratzasCertificate.png)
+
 ## The following **required** functionality is completed:
 
 ### Core Platform Development
